@@ -1,34 +1,34 @@
 <?xml version="1.0" encoding="utf-8"?>
 <search>
   <entry>
-    <title>2024HGAME</title>
+    <title>HGAME2024</title>
     <url>/2024/02/14/2024HGAME/</url>
-    <content><![CDATA[<p>2024HGAME网络攻防大赛部分题目题解</p>
+    <content><![CDATA[<p>HGAME2024网络攻防大赛 部分题目题解</p>
 <span id="more"></span>
 
 <h2 id="week1"><a href="#week1" class="headerlink" title="week1"></a>week1</h2><h3 id="web"><a href="#web" class="headerlink" title="web"></a>web</h3><h4 id="2048-16"><a href="#2048-16" class="headerlink" title="2048*16"></a>2048*16</h4><p>题目hint说达到要求分数即可得到flag，猜测是改网页源码，让游戏直接win</p>
 <p>查看网页源码，应该是被混淆了，但是题目给出了游戏的原版网页</p>
 <p>看原版网页的源码，找到</p>
-<p><img src="/.com//Blog\source_posts\Snipaste_2024-02-03_15-35-30.png" alt="Snipaste_2024-02-03_15-35-30"></p>
+<p><img src="/.com//2024HGAME%5CSnipaste_2024-02-03_15-35-30.png" alt="Snipaste_2024-02-03_15-35-30"></p>
 <p>里面判断出win &#x3D; !1就是游戏输赢的判断，改成1就可以，对照原版网页去改混淆过的网页</p>
-<p><img src="/.com//Blog\source_posts\Snipaste_2024-02-03_15-36-12.png" alt="Snipaste_2024-02-03_15-36-12"></p>
+<p><img src="/.com//2024HGAME%5CSnipaste_2024-02-03_15-36-12.png" alt="Snipaste_2024-02-03_15-36-12"></p>
 <p>对应this[x(460)] &#x3D; !1这句</p>
-<p><img src="/.com//Blog\source_posts\Snipaste_2024-02-03_15-36-44.png" alt="Snipaste_2024-02-03_15-36-44"></p>
+<p><img src="/.com//2024HGAME%5CSnipaste_2024-02-03_15-36-44.png" alt="Snipaste_2024-02-03_15-36-44"></p>
 <p>改源码后本地创建同样目录，进行替换</p>
 <p>因为调试时断点非常多，所以调试时取消断点</p>
 <p>启用调式，刷新页面，等待几秒后就出现flag</p>
 <h4 id="ezHTTP"><a href="#ezHTTP" class="headerlink" title="ezHTTP"></a>ezHTTP</h4><p>启动时，提示访问从vidar.club查看</p>
 <p>用hackbar添加一个Referer</p>
-<p><img src="/.com//Blog\source_posts\Snipaste_2024-02-03_16-28-11.png" alt="Snipaste_2024-02-03_16-28-11"></p>
+<p><img src="/.com//2024HGAME%5CSnipaste_2024-02-03_16-28-11.png" alt="Snipaste_2024-02-03_16-28-11"></p>
 <p>添加后提示</p>
-<p><img src="/.com//Blog\source_posts\Snipaste_2024-02-03_16-28-57.png" alt="Snipaste_2024-02-03_16-28-57"></p>
+<p><img src="/.com//2024HGAME%5CSnipaste_2024-02-03_16-28-57.png" alt="Snipaste_2024-02-03_16-28-57"></p>
 <p>这是一个明显的UA头</p>
 <p>改UA后提示从本地访问，加了XFF后不行，从网上查找得知UA还有别的添加方式</p>
 <p>添加X-Real-IP:127.0.0.1，后提示<code>Ok, the flag has been given to you ^-^</code>，但是没有找到flag，猜测藏在源码里</p>
 <p>找到响应头里有个字符串，base64解码后出flag</p>
 <h3 id="reverse"><a href="#reverse" class="headerlink" title="reverse"></a>reverse</h3><h4 id="ezASM"><a href="#ezASM" class="headerlink" title="ezASM"></a>ezASM</h4><p>汇编代码</p>
-<p><img src="/.com//Blog\source_posts\Snipaste_2024-02-14_14-05-31.png" alt="Snipaste_2024-02-14_14-05-31"></p>
-<p><img src="/.com//Blog\source_posts\Snipaste_2024-02-14_14-05-25.png" alt="Snipaste_2024-02-14_14-05-25"></p>
+<p><img src="/.com//2024HGAME%5CSnipaste_2024-02-14_14-05-31.png" alt="Snipaste_2024-02-14_14-05-31"></p>
+<p><img src="/.com//2024HGAME%5CSnipaste_2024-02-14_14-05-25.png" alt="Snipaste_2024-02-14_14-05-25"></p>
 <p>加密就是这个异或flag，密文也已经给出</p>
 <p>exp：</p>
 <figure class="highlight python"><table><tr><td class="code"><pre><span class="line">v = [<span class="number">74</span>, <span class="number">69</span>, <span class="number">67</span>, <span class="number">79</span>, <span class="number">71</span>, <span class="number">89</span>, <span class="number">99</span>, <span class="number">113</span>, <span class="number">111</span>, <span class="number">125</span>, <span class="number">107</span>, <span class="number">81</span>, <span class="number">125</span>, <span class="number">107</span>, <span class="number">79</span>, <span class="number">82</span>, <span class="number">18</span>, <span class="number">80</span>, <span class="number">86</span>, <span class="number">22</span>, <span class="number">76</span>, <span class="number">86</span>, <span class="number">125</span>, <span class="number">22</span>, <span class="number">125</span>, <span class="number">112</span>, <span class="number">71</span>, <span class="number">84</span>, <span class="number">17</span>, <span class="number">80</span>, <span class="number">81</span>, <span class="number">17</span>, <span class="number">95</span>, <span class="number">34</span>]</span><br><span class="line"><span class="keyword">for</span> i <span class="keyword">in</span> <span class="built_in">range</span>(<span class="built_in">len</span>(v)):</span><br><span class="line">    <span class="built_in">print</span>(<span class="built_in">chr</span>(v[i] ^ <span class="number">0x22</span>),end=<span class="string">&#x27;&#x27;</span>)</span><br></pre></td></tr></table></figure>
@@ -74,39 +74,39 @@
 
 
 
-<h3 id="misc"><a href="#misc" class="headerlink" title="misc"></a>misc</h3><h4 id="签到"><a href="#签到" class="headerlink" title="签到"></a>签到</h4><h4 id="SignIn"><a href="#SignIn" class="headerlink" title="SignIn"></a>SignIn</h4><p><img src="/.com//Blog\source_posts\try_another_way_to_see.png" alt="try_another_way_to_see"></p>
+<h3 id="misc"><a href="#misc" class="headerlink" title="misc"></a>misc</h3><h4 id="签到"><a href="#签到" class="headerlink" title="签到"></a>签到</h4><h4 id="SignIn"><a href="#SignIn" class="headerlink" title="SignIn"></a>SignIn</h4><p><img src="/.com//2024HGAME%5Ctry_another_way_to_see.png" alt="try_another_way_to_see"></p>
 <p>查看图片是一堆字符叠在一起，将图片拉伸一下得到flag</p>
 <h4 id="simple-attack"><a href="#simple-attack" class="headerlink" title="simple_attack"></a>simple_attack</h4><p>zip被加密了</p>
-<p><img src="/.com//Blog\source_posts\Snipaste_2024-02-14_11-23-35.png" alt="Snipaste_2024-02-14_11-23-35"></p>
+<p><img src="/.com//2024HGAME%5CSnipaste_2024-02-14_11-23-35.png" alt="Snipaste_2024-02-14_11-23-35"></p>
 <p>查看zip里面刚好有这张图片</p>
-<p><img src="/.com//Blog\source_posts\Snipaste_2024-02-14_11-23-59.png" alt="Snipaste_2024-02-14_11-23-59"></p>
+<p><img src="/.com//2024HGAME%5CSnipaste_2024-02-14_11-23-59.png" alt="Snipaste_2024-02-14_11-23-59"></p>
 <p>明文攻击，将jpg压缩后用appr进行明文攻击，得到解密后的压缩包内容</p>
-<p><img src="/.com//Blog\source_posts\Snipaste_2024-02-14_13-16-39.png" alt="Snipaste_2024-02-14_13-16-39"></p>
+<p><img src="/.com//2024HGAME%5CSnipaste_2024-02-14_13-16-39.png" alt="Snipaste_2024-02-14_13-16-39"></p>
 <p>图像base64解码</p>
-<p><img src="/.com//Blog\source_posts\Snipaste_2024-02-14_13-17-41.png" alt="Snipaste_2024-02-14_13-17-41"></p>
+<p><img src="/.com//2024HGAME%5CSnipaste_2024-02-14_13-17-41.png" alt="Snipaste_2024-02-14_13-17-41"></p>
 <h4 id="希儿希儿希尔"><a href="#希儿希儿希尔" class="headerlink" title="希儿希儿希尔"></a>希儿希儿希尔</h4><p>附件得到一个png图片，打不开，进行crc32校验</p>
-<p><img src="/.com//Blog\source_posts\Snipaste_2024-02-14_13-24-20.png" alt="Snipaste_2024-02-14_13-24-20"></p>
-<p><img src="/.com//Blog\source_posts\Snipaste_2024-02-14_13-24-30.png" alt="Snipaste_2024-02-14_13-24-30"></p>
+<p><img src="/.com//2024HGAME%5CSnipaste_2024-02-14_13-24-20.png" alt="Snipaste_2024-02-14_13-24-20"></p>
+<p><img src="/.com//2024HGAME%5CSnipaste_2024-02-14_13-24-30.png" alt="Snipaste_2024-02-14_13-24-30"></p>
 <p>crc爆破宽高</p>
 <figure class="highlight python"><table><tr><td class="code"><pre><span class="line"><span class="keyword">import</span> binascii</span><br><span class="line"><span class="keyword">import</span> struct</span><br><span class="line"></span><br><span class="line">crcbp = <span class="built_in">open</span>(<span class="string">&quot;secret.png&quot;</span>, <span class="string">&quot;rb&quot;</span>).read()  <span class="comment"># 打开图片</span></span><br><span class="line">crc32frombp = <span class="built_in">int</span>(crcbp[<span class="number">29</span>:<span class="number">33</span>].<span class="built_in">hex</span>(), <span class="number">16</span>)  <span class="comment"># 读取图片中的CRC校验值</span></span><br><span class="line"><span class="built_in">print</span>(crc32frombp)</span><br><span class="line"></span><br><span class="line"><span class="keyword">for</span> i <span class="keyword">in</span> <span class="built_in">range</span>(<span class="number">4000</span>):  <span class="comment"># 宽度1-4000进行枚举</span></span><br><span class="line">    <span class="keyword">for</span> j <span class="keyword">in</span> <span class="built_in">range</span>(<span class="number">4000</span>):  <span class="comment"># 高度1-4000进行枚举</span></span><br><span class="line">        data = crcbp[<span class="number">12</span>:<span class="number">16</span>] + \</span><br><span class="line">               struct.pack(<span class="string">&#x27;&gt;i&#x27;</span>, i) + struct.pack(<span class="string">&#x27;&gt;i&#x27;</span>, j) + crcbp[<span class="number">24</span>:<span class="number">29</span>]</span><br><span class="line">        crc32 = binascii.crc32(data) &amp; <span class="number">0xffffffff</span></span><br><span class="line">        <span class="keyword">if</span> (crc32 == crc32frombp):  <span class="comment"># 计算当图片大小为i:j时的CRC校验值，与图片中的CRC比较，当相同，则图片大小已经确定</span></span><br><span class="line">            <span class="built_in">print</span>(i, j)</span><br><span class="line">            <span class="built_in">print</span>(<span class="string">&#x27;hex:&#x27;</span>, <span class="built_in">hex</span>(i), <span class="built_in">hex</span>(j))</span><br><span class="line">            exit(<span class="number">0</span>)</span><br><span class="line"><span class="comment">#303792205</span></span><br><span class="line"><span class="comment">#1394 1999</span></span><br><span class="line"><span class="comment">#hex: 0x572 0x7cf</span></span><br></pre></td></tr></table></figure>
 
 <p>修改宽高后，使用binwalk看看能不能提取出什么内容</p>
-<p><img src="/.com//Blog\source_posts\Snipaste_2024-02-14_13-29-33.png" alt="Snipaste_2024-02-14_13-29-33"></p>
+<p><img src="/.com//2024HGAME%5CSnipaste_2024-02-14_13-29-33.png" alt="Snipaste_2024-02-14_13-29-33"></p>
 <p>提取出txt，应该就是密文，根据题目hint，应该是希尔密码，那么还需要key</p>
 <p>用Stegsolve看看有没有什么信息</p>
-<p><img src="/.com//Blog\source_posts\Snipaste_2024-02-14_13-32-17.png" alt="Snipaste_2024-02-14_13-32-17"></p>
+<p><img src="/.com//2024HGAME%5CSnipaste_2024-02-14_13-32-17.png" alt="Snipaste_2024-02-14_13-32-17"></p>
 <p>lsb隐写拿到key，最后希尔密码解密密文得到flag</p>
 <h4 id="来自星辰的问候"><a href="#来自星辰的问候" class="headerlink" title="来自星辰的问候"></a>来自星辰的问候</h4><p>jpg文件，使用stegdetect查看是什么加密</p>
-<p><img src="/.com//Blog\source_posts\Snipaste_2024-02-14_13-55-17.png" alt="Snipaste_2024-02-14_13-55-17"></p>
+<p><img src="/.com//2024HGAME%5CSnipaste_2024-02-14_13-55-17.png" alt="Snipaste_2024-02-14_13-55-17"></p>
 <p>stegdetect查出来是jphide，使用jphs解密发现需要口令</p>
 <p>用steghide爆破出口令</p>
 <p>steghide本身不提供爆破功能，需要用额外的脚本来完成这个功能</p>
 <figure class="highlight sh"><table><tr><td class="code"><pre><span class="line"><span class="comment">#bruteStegHide.sh </span></span><br><span class="line"><span class="comment">#!/bin/bash</span></span><br><span class="line"></span><br><span class="line"><span class="keyword">for</span> line <span class="keyword">in</span> `<span class="built_in">cat</span> <span class="variable">$2</span>`;<span class="keyword">do</span></span><br><span class="line">    steghide extract -sf <span class="variable">$1</span> -p <span class="variable">$line</span> &gt; /dev/null 2&gt;&amp;1</span><br><span class="line">    <span class="keyword">if</span> [[ $? -eq 0 ]];<span class="keyword">then</span></span><br><span class="line">        <span class="built_in">echo</span> <span class="string">&#x27;password is: &#x27;</span><span class="variable">$line</span></span><br><span class="line">        <span class="built_in">exit</span></span><br><span class="line">    <span class="keyword">fi</span>  </span><br><span class="line"><span class="keyword">done</span> </span><br></pre></td></tr></table></figure>
 
 <p>爆破得到来自星辰文字图片</p>
-<p><img src="/.com//Blog\source_posts\Snipaste_2024-02-14_13-58-54.png" alt="Snipaste_2024-02-14_13-58-54"></p>
+<p><img src="/.com//2024HGAME%5CSnipaste_2024-02-14_13-58-54.png" alt="Snipaste_2024-02-14_13-58-54"></p>
 <p>有点难懂，但是根据hint，需要去官网找对照表</p>
-<p><img src="/.com//Blog\source_posts\Snipaste_2024-02-14_14-00-35.png" alt="Snipaste_2024-02-14_14-00-35"></p>
+<p><img src="/.com//2024HGAME%5CSnipaste_2024-02-14_14-00-35.png" alt="Snipaste_2024-02-14_14-00-35"></p>
 <p>到官网f12，找到对照文件，译出密码</p>
 ]]></content>
   </entry>
