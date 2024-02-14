@@ -3,7 +3,8 @@
   <entry>
     <title>2024HGAME</title>
     <url>/2024/02/14/2024HGAME/</url>
-    <content><![CDATA[<span id="more"></span>
+    <content><![CDATA[<p>2024HGAME网络攻防大赛部分题目题解</p>
+<span id="more"></span>
 
 <h2 id="week1"><a href="#week1" class="headerlink" title="week1"></a>week1</h2><h3 id="web"><a href="#web" class="headerlink" title="web"></a>web</h3><h4 id="2048-16"><a href="#2048-16" class="headerlink" title="2048*16"></a>2048*16</h4><p>题目hint说达到要求分数即可得到flag，猜测是改网页源码，让游戏直接win</p>
 <p>查看网页源码，应该是被混淆了，但是题目给出了游戏的原版网页</p>

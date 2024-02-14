@@ -22,12 +22,12 @@
     var CONFIG = {"hostname":"example.com","root":"/","scheme":"Pisces","version":"7.8.0","exturl":false,"sidebar":{"position":"left","display":"post","padding":18,"offset":12,"onmobile":false},"copycode":{"enable":true,"show_result":false,"style":null},"back2top":{"enable":true,"sidebar":false,"scrollpercent":true},"bookmark":{"enable":false,"color":"#222","save":"auto"},"fancybox":false,"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"algolia":{"hits":{"per_page":10},"labels":{"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}},"localsearch":{"enable":true,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},"path":"search.xml"};
   </script>
 
-  <meta name="description" content="week1web2048*16题目hint说达到要求分数即可得到flag，猜测是改网页源码，让游戏直接win 查看网页源码，应该是被混淆了，但是题目给出了游戏的原版网页 看原版网页的源码，找到  里面判断出win &#x3D; !1就是游戏输赢的判断，改成1就可以，对照原版网页去改混淆过的网页  对应this[x(460)] &#x3D; !1这句  改源码后本地创建同样目录，进行替换 因为调">
+  <meta name="description" content="2024HGAME网络攻防大赛部分题目题解">
 <meta property="og:type" content="article">
 <meta property="og:title" content="2024HGAME">
 <meta property="og:url" content="http://example.com/2024/02/14/2024HGAME/index.html">
 <meta property="og:site_name" content="addr3s5&#39;Blog">
-<meta property="og:description" content="week1web2048*16题目hint说达到要求分数即可得到flag，猜测是改网页源码，让游戏直接win 查看网页源码，应该是被混淆了，但是题目给出了游戏的原版网页 看原版网页的源码，找到  里面判断出win &#x3D; !1就是游戏输赢的判断，改成1就可以，对照原版网页去改混淆过的网页  对应this[x(460)] &#x3D; !1这句  改源码后本地创建同样目录，进行替换 因为调">
+<meta property="og:description" content="2024HGAME网络攻防大赛部分题目题解">
 <meta property="og:locale" content="zh_CN">
 <meta property="og:image" content="http://example.com/.com//Blog/source_posts/2024HGAME/Snipaste_2024-02-03_15-35-30.png">
 <meta property="og:image" content="http://example.com/.com//Blog/source_posts/2024HGAME/Snipaste_2024-02-03_15-36-12.png">
@@ -49,7 +49,7 @@
 <meta property="og:image" content="http://example.com/.com//Blog/source_posts/2024HGAME/Snipaste_2024-02-14_13-58-54.png">
 <meta property="og:image" content="http://example.com/.com//Blog/source_posts/2024HGAME/Snipaste_2024-02-14_14-00-35.png">
 <meta property="article:published_time" content="2024-02-14T05:38:26.000Z">
-<meta property="article:modified_time" content="2024-02-14T06:09:29.167Z">
+<meta property="article:modified_time" content="2024-02-14T06:11:54.761Z">
 <meta property="article:author" content="addr3s5">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:image" content="http://example.com/.com//Blog/source_posts/2024HGAME/Snipaste_2024-02-03_15-35-30.png">
@@ -241,7 +241,7 @@
               <span class="post-meta-item-text">发表于</span>
               
 
-              <time title="创建时间：2024-02-14 13:38:26 / 修改时间：14:09:29" itemprop="dateCreated datePublished" datetime="2024-02-14T13:38:26+08:00">2024-02-14</time>
+              <time title="创建时间：2024-02-14 13:38:26 / 修改时间：14:11:54" itemprop="dateCreated datePublished" datetime="2024-02-14T13:38:26+08:00">2024-02-14</time>
             </span>
 
           
@@ -257,7 +257,7 @@
                 <i class="far fa-file-word"></i>
               </span>
                 <span class="post-meta-item-text">本文字数：</span>
-              <span>8.4k</span>
+              <span>8.5k</span>
             </span>
             <span class="post-meta-item" title="阅读时长">
               <span class="post-meta-item-icon">
@@ -276,7 +276,8 @@
     <div class="post-body" itemprop="articleBody">
 
       
-        <span id="more"></span>
+        <p>2024HGAME网络攻防大赛部分题目题解</p>
+<span id="more"></span>
 
 <h2 id="week1"><a href="#week1" class="headerlink" title="week1"></a>week1</h2><h3 id="web"><a href="#web" class="headerlink" title="web"></a>web</h3><h4 id="2048-16"><a href="#2048-16" class="headerlink" title="2048*16"></a>2048*16</h4><p>题目hint说达到要求分数即可得到flag，猜测是改网页源码，让游戏直接win</p>
 <p>查看网页源码，应该是被混淆了，但是题目给出了游戏的原版网页</p>
