@@ -49,7 +49,7 @@
 <meta property="og:image" content="http://example.com/2024/02/14/HGAME2024_week1/Snipaste_2024-02-14_13-58-54.png">
 <meta property="og:image" content="http://example.com/2024/02/14/HGAME2024_week1/Snipaste_2024-02-14_14-00-35.png">
 <meta property="article:published_time" content="2024-02-14T05:38:26.000Z">
-<meta property="article:modified_time" content="2024-02-14T14:09:13.836Z">
+<meta property="article:modified_time" content="2024-02-15T12:05:11.096Z">
 <meta property="article:author" content="addr3s5">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:image" content="http://example.com/2024/02/14/HGAME2024_week1/Snipaste_2024-02-03_15-35-30.png">
@@ -239,10 +239,16 @@
                 <i class="far fa-calendar"></i>
               </span>
               <span class="post-meta-item-text">发表于</span>
-              
 
-              <time title="创建时间：2024-02-14 13:38:26 / 修改时间：22:09:13" itemprop="dateCreated datePublished" datetime="2024-02-14T13:38:26+08:00">2024-02-14</time>
+              <time title="创建时间：2024-02-14 13:38:26" itemprop="dateCreated datePublished" datetime="2024-02-14T13:38:26+08:00">2024-02-14</time>
             </span>
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="far fa-calendar-check"></i>
+                </span>
+                <span class="post-meta-item-text">更新于</span>
+                <time title="修改时间：2024-02-15 20:05:11" itemprop="dateModified" datetime="2024-02-15T20:05:11+08:00">2024-02-15</time>
+              </span>
 
           
             <span class="post-meta-item" title="阅读次数" id="busuanzi_container_page_pv" style="display: none;">
@@ -279,7 +285,7 @@
         <p>HGAME 2024网络攻防大赛—week1部分题目题解</p>
 <span id="more"></span>
 
-<h2 id="week1"><a href="#week1" class="headerlink" title="week1"></a>week1</h2><h3 id="web"><a href="#web" class="headerlink" title="web"></a>web</h3><h4 id="2048-16"><a href="#2048-16" class="headerlink" title="2048*16"></a>2048*16</h4><p>题目hint说达到要求分数即可得到flag，猜测是改网页源码，让游戏直接win</p>
+<h2 id="web"><a href="#web" class="headerlink" title="web"></a>web</h2><h4 id="2048-16"><a href="#2048-16" class="headerlink" title="2048*16"></a>2048*16</h4><p>题目hint说达到要求分数即可得到flag，猜测是改网页源码，让游戏直接win</p>
 <p>查看网页源码，应该是被混淆了，但是题目给出了游戏的原版网页</p>
 <p>看原版网页的源码，找到</p>
 <p><img src="Snipaste_2024-02-03_15-35-30.png" alt="Snipaste_2024-02-03_15-35-30"></p>
@@ -299,7 +305,7 @@
 <p>改UA后提示从本地访问，加了XFF后不行，从网上查找得知UA还有别的添加方式</p>
 <p>添加X-Real-IP:127.0.0.1，后提示<code>Ok, the flag has been given to you ^-^</code>，但是没有找到flag，猜测藏在源码里</p>
 <p>找到响应头里有个字符串，base64解码后出flag</p>
-<h3 id="reverse"><a href="#reverse" class="headerlink" title="reverse"></a>reverse</h3><h4 id="ezASM"><a href="#ezASM" class="headerlink" title="ezASM"></a>ezASM</h4><p>汇编代码</p>
+<h2 id="reverse"><a href="#reverse" class="headerlink" title="reverse"></a>reverse</h2><h4 id="ezASM"><a href="#ezASM" class="headerlink" title="ezASM"></a>ezASM</h4><p>汇编代码</p>
 <p><img src="Snipaste_2024-02-14_14-05-31.png" alt="Snipaste_2024-02-14_14-05-31"></p>
 <p><img src="Snipaste_2024-02-14_14-05-25.png" alt="Snipaste_2024-02-14_14-05-25"></p>
 <p>加密就是这个异或flag，密文也已经给出</p>
@@ -328,7 +334,7 @@
 
 
 <h4 id="ezIDA"><a href="#ezIDA" class="headerlink" title="ezIDA"></a>ezIDA</h4><p>逆向签到题，IDA打开就有</p>
-<h3 id="crypto"><a href="#crypto" class="headerlink" title="crypto"></a>crypto</h3><h4 id="ezRSA"><a href="#ezRSA" class="headerlink" title="ezRSA"></a>ezRSA</h4><p>attachment.py</p>
+<h2 id="crypto"><a href="#crypto" class="headerlink" title="crypto"></a>crypto</h2><h4 id="ezRSA"><a href="#ezRSA" class="headerlink" title="ezRSA"></a>ezRSA</h4><p>attachment.py</p>
 <figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">from</span> Crypto.Util.number <span class="keyword">import</span> *</span><br><span class="line"><span class="keyword">from</span> secret <span class="keyword">import</span> flag</span><br><span class="line">m=bytes_to_long(flag)</span><br><span class="line">p=getPrime(<span class="number">1024</span>)</span><br><span class="line">q=getPrime(<span class="number">1024</span>)</span><br><span class="line">n=p*q</span><br><span class="line">phi=(p-<span class="number">1</span>)*(q-<span class="number">1</span>)</span><br><span class="line">e=<span class="number">0x10001</span></span><br><span class="line">c=<span class="built_in">pow</span>(m,e,n)</span><br><span class="line">leak1=<span class="built_in">pow</span>(p,q,n)</span><br><span class="line">leak2=<span class="built_in">pow</span>(q,p,n)</span><br><span class="line"></span><br><span class="line"><span class="built_in">print</span>(<span class="string">f&#x27;leak1=<span class="subst">&#123;leak1&#125;</span>&#x27;</span>)</span><br><span class="line"><span class="built_in">print</span>(<span class="string">f&#x27;leak2=<span class="subst">&#123;leak2&#125;</span>&#x27;</span>)</span><br><span class="line"><span class="built_in">print</span>(<span class="string">f&#x27;c=<span class="subst">&#123;c&#125;</span>&#x27;</span>)</span><br><span class="line"></span><br><span class="line"><span class="string">&quot;&quot;&quot;</span></span><br><span class="line"><span class="string">leak1=149127170073611271968182576751290331559018441805725310426095412837589227670757540743929865853650399839102838431507200744724939659463200158012469676979987696419050900842798225665861812331113632892438742724202916416060266581590169063867688299288985734104127632232175657352697898383441323477450658179727728908669</span></span><br><span class="line"><span class="string">leak2=116122992714670915381309916967490436489020001172880644167179915467021794892927977272080596641785569119134259037522388335198043152206150259103485574558816424740204736215551933482583941959994625356581201054534529395781744338631021423703171146456663432955843598548122593308782245220792018716508538497402576709461</span></span><br><span class="line"><span class="string">c=10529481867532520034258056773864074017027019578041866245400647840230251661652999709715919620810933437191661180003295923273655675729588558899592524235622728816065501918076120812236580344991140980991532347991252705288633014913479970610056845543523591324177567061948922552275235486615514913932125436543991642607028689762693617305246716492783116813070355512606971626645594961850567586340389705821314842096465631886812281289843132258131809773797777049358789182212570606252509790830994263132020094153646296793522975632191912463919898988349282284972919932761952603379733234575351624039162440021940592552768579639977713099971</span></span><br><span class="line"><span class="string">&quot;&quot;&quot;</span></span><br></pre></td></tr></table></figure>
 
 <p>exp:</p>
@@ -347,7 +353,7 @@
 
 
 
-<h3 id="misc"><a href="#misc" class="headerlink" title="misc"></a>misc</h3><h4 id="签到"><a href="#签到" class="headerlink" title="签到"></a>签到</h4><h4 id="SignIn"><a href="#SignIn" class="headerlink" title="SignIn"></a>SignIn</h4><p><img src="try_another_way_to_see.png" alt="try_another_way_to_see"></p>
+<h2 id="misc"><a href="#misc" class="headerlink" title="misc"></a>misc</h2><h4 id="签到"><a href="#签到" class="headerlink" title="签到"></a>签到</h4><h4 id="SignIn"><a href="#SignIn" class="headerlink" title="SignIn"></a>SignIn</h4><p><img src="try_another_way_to_see.png" alt="try_another_way_to_see"></p>
 <p>查看图片是一堆字符叠在一起，将图片拉伸一下得到flag</p>
 <h4 id="simple-attack"><a href="#simple-attack" class="headerlink" title="simple_attack"></a>simple_attack</h4><p>zip被加密了</p>
 <p><img src="Snipaste_2024-02-14_11-23-35.png" alt="Snipaste_2024-02-14_11-23-35"></p>
@@ -469,7 +475,7 @@
 
       <!--noindex-->
       <div class="post-toc-wrap sidebar-panel">
-          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#week1"><span class="nav-number">1.</span> <span class="nav-text">week1</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#web"><span class="nav-number">1.1.</span> <span class="nav-text">web</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#2048-16"><span class="nav-number">1.1.1.</span> <span class="nav-text">2048*16</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#ezHTTP"><span class="nav-number">1.1.2.</span> <span class="nav-text">ezHTTP</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#reverse"><span class="nav-number">1.2.</span> <span class="nav-text">reverse</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#ezASM"><span class="nav-number">1.2.1.</span> <span class="nav-text">ezASM</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#ezPYC"><span class="nav-number">1.2.2.</span> <span class="nav-text">ezPYC</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#ezUPX"><span class="nav-number">1.2.3.</span> <span class="nav-text">ezUPX</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#ezIDA"><span class="nav-number">1.2.4.</span> <span class="nav-text">ezIDA</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#crypto"><span class="nav-number">1.3.</span> <span class="nav-text">crypto</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#ezRSA"><span class="nav-number">1.3.1.</span> <span class="nav-text">ezRSA</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#ezMath"><span class="nav-number">1.3.2.</span> <span class="nav-text">ezMath</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#misc"><span class="nav-number">1.4.</span> <span class="nav-text">misc</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#%E7%AD%BE%E5%88%B0"><span class="nav-number">1.4.1.</span> <span class="nav-text">签到</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#SignIn"><span class="nav-number">1.4.2.</span> <span class="nav-text">SignIn</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#simple-attack"><span class="nav-number">1.4.3.</span> <span class="nav-text">simple_attack</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#%E5%B8%8C%E5%84%BF%E5%B8%8C%E5%84%BF%E5%B8%8C%E5%B0%94"><span class="nav-number">1.4.4.</span> <span class="nav-text">希儿希儿希尔</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#%E6%9D%A5%E8%87%AA%E6%98%9F%E8%BE%B0%E7%9A%84%E9%97%AE%E5%80%99"><span class="nav-number">1.4.5.</span> <span class="nav-text">来自星辰的问候</span></a></li></ol></li></ol></li></ol></div>
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#web"><span class="nav-number">1.</span> <span class="nav-text">web</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#2048-16"><span class="nav-number">1.0.1.</span> <span class="nav-text">2048*16</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#ezHTTP"><span class="nav-number">1.0.2.</span> <span class="nav-text">ezHTTP</span></a></li></ol></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#reverse"><span class="nav-number">2.</span> <span class="nav-text">reverse</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#ezASM"><span class="nav-number">2.0.1.</span> <span class="nav-text">ezASM</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#ezPYC"><span class="nav-number">2.0.2.</span> <span class="nav-text">ezPYC</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#ezUPX"><span class="nav-number">2.0.3.</span> <span class="nav-text">ezUPX</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#ezIDA"><span class="nav-number">2.0.4.</span> <span class="nav-text">ezIDA</span></a></li></ol></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#crypto"><span class="nav-number">3.</span> <span class="nav-text">crypto</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#ezRSA"><span class="nav-number">3.0.1.</span> <span class="nav-text">ezRSA</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#ezMath"><span class="nav-number">3.0.2.</span> <span class="nav-text">ezMath</span></a></li></ol></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#misc"><span class="nav-number">4.</span> <span class="nav-text">misc</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#%E7%AD%BE%E5%88%B0"><span class="nav-number">4.0.1.</span> <span class="nav-text">签到</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#SignIn"><span class="nav-number">4.0.2.</span> <span class="nav-text">SignIn</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#simple-attack"><span class="nav-number">4.0.3.</span> <span class="nav-text">simple_attack</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#%E5%B8%8C%E5%84%BF%E5%B8%8C%E5%84%BF%E5%B8%8C%E5%B0%94"><span class="nav-number">4.0.4.</span> <span class="nav-text">希儿希儿希尔</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#%E6%9D%A5%E8%87%AA%E6%98%9F%E8%BE%B0%E7%9A%84%E9%97%AE%E5%80%99"><span class="nav-number">4.0.5.</span> <span class="nav-text">来自星辰的问候</span></a></li></ol></li></ol></li></ol></div>
       </div>
       <!--/noindex-->
 

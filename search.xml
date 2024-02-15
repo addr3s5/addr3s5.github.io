@@ -6,7 +6,7 @@
     <content><![CDATA[<p>HGAME 2024网络攻防大赛—week2部分题目题解</p>
 <span id="more"></span>
 
-<h2 id="week2"><a href="#week2" class="headerlink" title="week2"></a>week2</h2><h3 id="reverse"><a href="#reverse" class="headerlink" title="reverse"></a>reverse</h3><h4 id="ezcpp"><a href="#ezcpp" class="headerlink" title="ezcpp"></a>ezcpp</h4><p>IDA打开</p>
+<h2 id="reverse"><a href="#reverse" class="headerlink" title="reverse"></a>reverse</h2><h4 id="ezcpp"><a href="#ezcpp" class="headerlink" title="ezcpp"></a>ezcpp</h4><p>IDA打开</p>
 <p><img src="Snipaste_2024-02-09_23-30-02.png" alt="Snipaste_2024-02-09_23-30-02"></p>
 <p>是一个展开的tea</p>
 <p>并且就前几个字节在加密，直接上tea经典解密脚本</p>
@@ -79,7 +79,7 @@
 
 
 
-<h3 id="crypto"><a href="#crypto" class="headerlink" title="crypto"></a>crypto</h3><h4 id="midRSA"><a href="#midRSA" class="headerlink" title="midRSA"></a>midRSA</h4><p>midRSA.py</p>
+<h2 id="crypto"><a href="#crypto" class="headerlink" title="crypto"></a>crypto</h2><h4 id="midRSA"><a href="#midRSA" class="headerlink" title="midRSA"></a>midRSA</h4><p>midRSA.py</p>
 <figure class="highlight python"><table><tr><td class="code"><pre><span class="line"><span class="keyword">from</span> Crypto.Util.number <span class="keyword">import</span> *</span><br><span class="line"><span class="keyword">from</span> secret <span class="keyword">import</span> flag</span><br><span class="line"></span><br><span class="line"><span class="keyword">def</span> <span class="title function_">padding</span>(<span class="params">flag</span>):</span><br><span class="line">    <span class="keyword">return</span> flag+<span class="string">b&#x27;\xff&#x27;</span>*(<span class="number">64</span>-<span class="built_in">len</span>(flag))</span><br><span class="line"></span><br><span class="line">flag=padding(flag)</span><br><span class="line">m=bytes_to_long(flag)</span><br><span class="line">p=getPrime(<span class="number">512</span>)</span><br><span class="line">q=getPrime(<span class="number">512</span>)</span><br><span class="line">e=<span class="number">3</span></span><br><span class="line">n=p*q</span><br><span class="line">c=<span class="built_in">pow</span>(m,e,n)</span><br><span class="line">m0=m&gt;&gt;<span class="number">208</span></span><br><span class="line"></span><br><span class="line"><span class="built_in">print</span>(<span class="string">f&#x27;n=<span class="subst">&#123;n&#125;</span>&#x27;</span>)</span><br><span class="line"><span class="built_in">print</span>(<span class="string">f&#x27;c=<span class="subst">&#123;c&#125;</span>&#x27;</span>)</span><br><span class="line"><span class="built_in">print</span>(<span class="string">f&#x27;m0=<span class="subst">&#123;m0&#125;</span>&#x27;</span>)</span><br><span class="line"></span><br><span class="line"><span class="string">&quot;&quot;&quot;</span></span><br><span class="line"><span class="string">n=120838778421252867808799302603972821425274682456261749029016472234934876266617266346399909705742862458970575637664059189613618956880430078774892479256301209695323302787221508556481196281420676074116272495278097275927604857336484564777404497914572606299810384987412594844071935546690819906920254004045391585427</span></span><br><span class="line"><span class="string">c=118961547254465282603128910126369011072248057317653811110746611348016137361383017921465395766977129601435508590006599755740818071303929227578504412967513468921191689357367045286190040251695094706564443721393216185563727951256414649625597950957960429709583109707961019498084511008637686004730015209939219983527</span></span><br><span class="line"><span class="string">m0=13292147408567087351580732082961640130543313742210409432471625281702327748963274496942276607</span></span><br><span class="line"><span class="string">&quot;&quot;&quot;</span></span><br><span class="line"></span><br></pre></td></tr></table></figure>
 
 <p>m高位泄露，直接解了</p>
@@ -116,7 +116,7 @@
 
 
 
-<h3 id="misc"><a href="#misc" class="headerlink" title="misc"></a>misc</h3><h4 id="ek1ng-want-girlfriend"><a href="#ek1ng-want-girlfriend" class="headerlink" title="ek1ng_want_girlfriend"></a>ek1ng_want_girlfriend</h4><p>wireshark打开</p>
+<h2 id="misc"><a href="#misc" class="headerlink" title="misc"></a>misc</h2><h4 id="ek1ng-want-girlfriend"><a href="#ek1ng-want-girlfriend" class="headerlink" title="ek1ng_want_girlfriend"></a>ek1ng_want_girlfriend</h4><p>wireshark打开</p>
 <p><img src="Snipaste_2024-02-15_15-33-06.png" alt="Snipaste_2024-02-15_15-33-06"></p>
 <p><img src="Snipaste_2024-02-09_23-20-08.png" alt="Snipaste_2024-02-09_23-20-08"></p>
 <p>追踪http，后导出字节流</p>
@@ -145,7 +145,7 @@
     <content><![CDATA[<p>HGAME 2024网络攻防大赛—week1部分题目题解</p>
 <span id="more"></span>
 
-<h2 id="week1"><a href="#week1" class="headerlink" title="week1"></a>week1</h2><h3 id="web"><a href="#web" class="headerlink" title="web"></a>web</h3><h4 id="2048-16"><a href="#2048-16" class="headerlink" title="2048*16"></a>2048*16</h4><p>题目hint说达到要求分数即可得到flag，猜测是改网页源码，让游戏直接win</p>
+<h2 id="web"><a href="#web" class="headerlink" title="web"></a>web</h2><h4 id="2048-16"><a href="#2048-16" class="headerlink" title="2048*16"></a>2048*16</h4><p>题目hint说达到要求分数即可得到flag，猜测是改网页源码，让游戏直接win</p>
 <p>查看网页源码，应该是被混淆了，但是题目给出了游戏的原版网页</p>
 <p>看原版网页的源码，找到</p>
 <p><img src="Snipaste_2024-02-03_15-35-30.png" alt="Snipaste_2024-02-03_15-35-30"></p>
@@ -165,7 +165,7 @@
 <p>改UA后提示从本地访问，加了XFF后不行，从网上查找得知UA还有别的添加方式</p>
 <p>添加X-Real-IP:127.0.0.1，后提示<code>Ok, the flag has been given to you ^-^</code>，但是没有找到flag，猜测藏在源码里</p>
 <p>找到响应头里有个字符串，base64解码后出flag</p>
-<h3 id="reverse"><a href="#reverse" class="headerlink" title="reverse"></a>reverse</h3><h4 id="ezASM"><a href="#ezASM" class="headerlink" title="ezASM"></a>ezASM</h4><p>汇编代码</p>
+<h2 id="reverse"><a href="#reverse" class="headerlink" title="reverse"></a>reverse</h2><h4 id="ezASM"><a href="#ezASM" class="headerlink" title="ezASM"></a>ezASM</h4><p>汇编代码</p>
 <p><img src="Snipaste_2024-02-14_14-05-31.png" alt="Snipaste_2024-02-14_14-05-31"></p>
 <p><img src="Snipaste_2024-02-14_14-05-25.png" alt="Snipaste_2024-02-14_14-05-25"></p>
 <p>加密就是这个异或flag，密文也已经给出</p>
@@ -194,7 +194,7 @@
 
 
 <h4 id="ezIDA"><a href="#ezIDA" class="headerlink" title="ezIDA"></a>ezIDA</h4><p>逆向签到题，IDA打开就有</p>
-<h3 id="crypto"><a href="#crypto" class="headerlink" title="crypto"></a>crypto</h3><h4 id="ezRSA"><a href="#ezRSA" class="headerlink" title="ezRSA"></a>ezRSA</h4><p>attachment.py</p>
+<h2 id="crypto"><a href="#crypto" class="headerlink" title="crypto"></a>crypto</h2><h4 id="ezRSA"><a href="#ezRSA" class="headerlink" title="ezRSA"></a>ezRSA</h4><p>attachment.py</p>
 <figure class="highlight python"><table><tr><td class="code"><pre><span class="line"><span class="keyword">from</span> Crypto.Util.number <span class="keyword">import</span> *</span><br><span class="line"><span class="keyword">from</span> secret <span class="keyword">import</span> flag</span><br><span class="line">m=bytes_to_long(flag)</span><br><span class="line">p=getPrime(<span class="number">1024</span>)</span><br><span class="line">q=getPrime(<span class="number">1024</span>)</span><br><span class="line">n=p*q</span><br><span class="line">phi=(p-<span class="number">1</span>)*(q-<span class="number">1</span>)</span><br><span class="line">e=<span class="number">0x10001</span></span><br><span class="line">c=<span class="built_in">pow</span>(m,e,n)</span><br><span class="line">leak1=<span class="built_in">pow</span>(p,q,n)</span><br><span class="line">leak2=<span class="built_in">pow</span>(q,p,n)</span><br><span class="line"></span><br><span class="line"><span class="built_in">print</span>(<span class="string">f&#x27;leak1=<span class="subst">&#123;leak1&#125;</span>&#x27;</span>)</span><br><span class="line"><span class="built_in">print</span>(<span class="string">f&#x27;leak2=<span class="subst">&#123;leak2&#125;</span>&#x27;</span>)</span><br><span class="line"><span class="built_in">print</span>(<span class="string">f&#x27;c=<span class="subst">&#123;c&#125;</span>&#x27;</span>)</span><br><span class="line"></span><br><span class="line"><span class="string">&quot;&quot;&quot;</span></span><br><span class="line"><span class="string">leak1=149127170073611271968182576751290331559018441805725310426095412837589227670757540743929865853650399839102838431507200744724939659463200158012469676979987696419050900842798225665861812331113632892438742724202916416060266581590169063867688299288985734104127632232175657352697898383441323477450658179727728908669</span></span><br><span class="line"><span class="string">leak2=116122992714670915381309916967490436489020001172880644167179915467021794892927977272080596641785569119134259037522388335198043152206150259103485574558816424740204736215551933482583941959994625356581201054534529395781744338631021423703171146456663432955843598548122593308782245220792018716508538497402576709461</span></span><br><span class="line"><span class="string">c=10529481867532520034258056773864074017027019578041866245400647840230251661652999709715919620810933437191661180003295923273655675729588558899592524235622728816065501918076120812236580344991140980991532347991252705288633014913479970610056845543523591324177567061948922552275235486615514913932125436543991642607028689762693617305246716492783116813070355512606971626645594961850567586340389705821314842096465631886812281289843132258131809773797777049358789182212570606252509790830994263132020094153646296793522975632191912463919898988349282284972919932761952603379733234575351624039162440021940592552768579639977713099971</span></span><br><span class="line"><span class="string">&quot;&quot;&quot;</span></span><br></pre></td></tr></table></figure>
 
 <p>exp:</p>
@@ -213,7 +213,7 @@
 
 
 
-<h3 id="misc"><a href="#misc" class="headerlink" title="misc"></a>misc</h3><h4 id="签到"><a href="#签到" class="headerlink" title="签到"></a>签到</h4><h4 id="SignIn"><a href="#SignIn" class="headerlink" title="SignIn"></a>SignIn</h4><p><img src="try_another_way_to_see.png" alt="try_another_way_to_see"></p>
+<h2 id="misc"><a href="#misc" class="headerlink" title="misc"></a>misc</h2><h4 id="签到"><a href="#签到" class="headerlink" title="签到"></a>签到</h4><h4 id="SignIn"><a href="#SignIn" class="headerlink" title="SignIn"></a>SignIn</h4><p><img src="try_another_way_to_see.png" alt="try_another_way_to_see"></p>
 <p>查看图片是一堆字符叠在一起，将图片拉伸一下得到flag</p>
 <h4 id="simple-attack"><a href="#simple-attack" class="headerlink" title="simple_attack"></a>simple_attack</h4><p>zip被加密了</p>
 <p><img src="Snipaste_2024-02-14_11-23-35.png" alt="Snipaste_2024-02-14_11-23-35"></p>
