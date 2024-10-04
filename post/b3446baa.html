@@ -29,22 +29,22 @@
 <meta property="og:site_name" content="addr3s5&#39;Blog">
 <meta property="og:description" content="HGAME 2024网络攻防大赛—week4部分题目题解">
 <meta property="og:locale" content="zh_CN">
-<meta property="og:image" content="http://example.com/post/image-20240301175715211.png">
-<meta property="og:image" content="http://example.com/post/image-20240301180012995.png">
-<meta property="og:image" content="http://example.com/post/image-20240301181022547.png">
-<meta property="og:image" content="http://example.com/post/image-20240301181050913.png">
-<meta property="og:image" content="http://example.com/post/image-20240301181340809.png">
-<meta property="og:image" content="http://example.com/post/image-20240301181547044.png">
-<meta property="og:image" content="http://example.com/post/image-20240301181716921.png">
-<meta property="og:image" content="http://example.com/post/image-20240301181750892.png">
-<meta property="og:image" content="http://example.com/post/image-20240301182129960.png">
-<meta property="og:image" content="http://example.com/post/image-20240301182757286.png">
+<meta property="og:image" content="http://example.com/post/b3446baa/image-20240301175715211.png">
+<meta property="og:image" content="http://example.com/post/b3446baa/image-20240301180012995.png">
+<meta property="og:image" content="http://example.com/post/b3446baa/image-20240301181022547.png">
+<meta property="og:image" content="http://example.com/post/b3446baa/image-20240301181050913.png">
+<meta property="og:image" content="http://example.com/post/b3446baa/image-20240301181340809.png">
+<meta property="og:image" content="http://example.com/post/b3446baa/image-20240301181547044.png">
+<meta property="og:image" content="http://example.com/post/b3446baa/image-20240301181716921.png">
+<meta property="og:image" content="http://example.com/post/b3446baa/image-20240301181750892.png">
+<meta property="og:image" content="http://example.com/post/b3446baa/image-20240301182129960.png">
+<meta property="og:image" content="http://example.com/post/b3446baa/image-20240301182757286.png">
 <meta property="article:published_time" content="2024-03-01T09:55:04.000Z">
-<meta property="article:modified_time" content="2024-03-01T10:45:53.240Z">
+<meta property="article:modified_time" content="2024-10-04T15:18:05.515Z">
 <meta property="article:author" content="addr3s5">
 <meta property="article:tag" content="WP">
 <meta name="twitter:card" content="summary">
-<meta name="twitter:image" content="http://example.com/post/image-20240301175715211.png">
+<meta name="twitter:image" content="http://example.com/post/b3446baa/image-20240301175715211.png">
 
 <link rel="canonical" href="http://example.com/post/b3446baa.html">
 
@@ -230,10 +230,16 @@
                 <i class="far fa-calendar"></i>
               </span>
               <span class="post-meta-item-text">发表于</span>
-              
 
-              <time title="创建时间：2024-03-01 17:55:04 / 修改时间：18:45:53" itemprop="dateCreated datePublished" datetime="2024-03-01T17:55:04+08:00">2024-03-01</time>
+              <time title="创建时间：2024-03-01 17:55:04" itemprop="dateCreated datePublished" datetime="2024-03-01T17:55:04+08:00">2024-03-01</time>
             </span>
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="far fa-calendar-check"></i>
+                </span>
+                <span class="post-meta-item-text">更新于</span>
+                <time title="修改时间：2024-10-04 23:18:05" itemprop="dateModified" datetime="2024-10-04T23:18:05+08:00">2024-10-04</time>
+              </span>
             <span class="post-meta-item">
               <span class="post-meta-item-icon">
                 <i class="far fa-folder"></i>
@@ -280,10 +286,12 @@
 <span id="more"></span>
 
 <h2 id="reverse"><a href="#reverse" class="headerlink" title="reverse"></a>reverse</h2><h3 id="change"><a href="#change" class="headerlink" title="change"></a>change</h3><p>IDA打开，又是一个cpp程序</p>
-<p><img src="image-20240301175715211.png" alt="image-20240301175715211"></p>
+<img src="b3446baa/image-20240301175715211.png" class title="image-20240301175715211">
+
 <p>先看一下main函数</p>
 <p>先赋值一个字符串<code>am2qasl</code>给v10，后读入flag，经过<code>sub_1400029A0</code>函数的加密，最后和密文<code>byte_140008000</code>比较，逻辑很清晰，进入<code>sub_1400029A0</code>函数看看</p>
-<p><img src="image-20240301180012995.png" alt="image-20240301180012995"></p>
+<img src="b3446baa/image-20240301180012995.png" class title="image-20240301180012995">
+
 <p>加密就是在奇偶位调用不同的异或，为奇则<code>a2 ^ a1</code>，为偶则<code>(a2 ^ a1) + 10</code></p>
 <p>这里的a1，a2应该分别就是flag和上面的字符串<code>am2qasl</code></p>
 <p>exp：</p>
@@ -307,9 +315,11 @@
 <figure class="highlight python"><table><tr><td class="code"><pre><span class="line">t = <span class="string">&#x27;a405b5d321e446459d8f9169d027bd92&#x27;</span></span><br><span class="line"><span class="keyword">with</span> <span class="built_in">open</span>(<span class="string">&#x27;bin2&#x27;</span>, <span class="string">&#x27;rb&#x27;</span>) <span class="keyword">as</span> f:</span><br><span class="line">    data = <span class="built_in">bytearray</span>(f.read())</span><br><span class="line"></span><br><span class="line">result = <span class="built_in">bytearray</span>(b ^ <span class="built_in">ord</span>(t[i % <span class="built_in">len</span>(t)]) <span class="keyword">for</span> i, b <span class="keyword">in</span> <span class="built_in">enumerate</span>(data))</span><br><span class="line"></span><br><span class="line"><span class="keyword">with</span> <span class="built_in">open</span>(<span class="string">&#x27;output.exe&#x27;</span>, <span class="string">&#x27;wb&#x27;</span>) <span class="keyword">as</span> f:</span><br><span class="line">    f.write(result)</span><br></pre></td></tr></table></figure>
 
 <p>将得到的exe用IDA打开</p>
-<p><img src="image-20240301181022547.png" alt="image-20240301181022547"></p>
+<img src="b3446baa/image-20240301181022547.png" class title="image-20240301181022547">
+
 <p>加密函数为<code>sub_1400010E0</code></p>
-<p><img src="image-20240301181050913.png" alt="image-20240301181050913"></p>
+<img src="b3446baa/image-20240301181050913.png" class title="image-20240301181050913">
+
 <p>是一个xxtea，那么main函数中的<code>v7</code>就是key，密文也已经有了，直接用xxtea脚本解</p>
 <p>exp：</p>
 <figure class="highlight c"><table><tr><td class="code"><pre><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;stdio.h&gt;</span></span></span><br><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;stdint.h&gt;</span></span></span><br><span class="line"><span class="meta">#<span class="keyword">include</span><span class="string">&lt;stdlib.h&gt;</span></span></span><br><span class="line"><span class="meta">#<span class="keyword">define</span> DELTA 0x7937B99E</span></span><br><span class="line"><span class="meta">#<span class="keyword">define</span> MX ((sum ^ y) + (k[(p&amp;3)^e] ^ z)) ^ (((16 * z) ^ (y &gt;&gt; 3)) + ((z &gt;&gt; 5) ^ (4 * y)))</span></span><br><span class="line"><span class="type">void</span> <span class="title function_">decrypt</span><span class="params">(<span class="type">uint32_t</span>* v, <span class="type">int</span> n, <span class="type">uint32_t</span>* k)</span> &#123;</span><br><span class="line">    <span class="type">uint32_t</span> y, z, sum;</span><br><span class="line">    <span class="type">unsigned</span> p, rounds, e;</span><br><span class="line">    rounds = <span class="number">12</span>;</span><br><span class="line">    sum = rounds*DELTA;</span><br><span class="line">    y = v[<span class="number">0</span>];</span><br><span class="line">    <span class="keyword">do</span></span><br><span class="line">    &#123;</span><br><span class="line">        e = (sum &gt;&gt; <span class="number">2</span>) &amp; <span class="number">3</span>;</span><br><span class="line">            <span class="keyword">for</span> (p=n<span class="number">-1</span>; p&gt;<span class="number">0</span>; p--)</span><br><span class="line">            &#123;</span><br><span class="line">                z = v[p<span class="number">-1</span>];</span><br><span class="line">                y = v[p] -= MX;</span><br><span class="line">            &#125;</span><br><span class="line">            z = v[n<span class="number">-1</span>];</span><br><span class="line">            y = v[<span class="number">0</span>] -= MX;</span><br><span class="line">            sum -= DELTA;</span><br><span class="line">    &#125; <span class="keyword">while</span> (--rounds);</span><br><span class="line">    </span><br><span class="line">    </span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="type">int</span> <span class="title function_">main</span><span class="params">()</span></span><br><span class="line">&#123;</span><br><span class="line">    <span class="type">uint32_t</span> j,m;</span><br><span class="line">    <span class="type">uint8_t</span> v[<span class="number">33</span>] = &#123; <span class="number">0xC3</span>, <span class="number">0xB5</span>, <span class="number">0x6F</span>, <span class="number">0x50</span>, <span class="number">0x45</span>, <span class="number">0x8F</span>, <span class="number">0x35</span>, <span class="number">0xB9</span>, <span class="number">0xC7</span>, <span class="number">0xE8</span>, </span><br><span class="line">  <span class="number">0x1A</span>, <span class="number">0xC9</span>, <span class="number">0x80</span>, <span class="number">0xE2</span>, <span class="number">0x20</span>, <span class="number">0x38</span>, <span class="number">0x83</span>, <span class="number">0xBA</span>, <span class="number">0x3A</span>, <span class="number">0xD1</span>, </span><br><span class="line">  <span class="number">0x54</span>, <span class="number">0xF5</span>, <span class="number">0x5C</span>, <span class="number">0x97</span>, <span class="number">0x6B</span>, <span class="number">0x03</span>, <span class="number">0x52</span>, <span class="number">0x43</span>, <span class="number">0x47</span>, <span class="number">0x04</span>, </span><br><span class="line">  <span class="number">0xD2</span>, <span class="number">0x1C</span>&#125;;</span><br><span class="line">    <span class="type">uint32_t</span> k[<span class="number">4</span>] = &#123; <span class="number">0x1234</span>, <span class="number">0x2341</span>, <span class="number">0x3412</span>, <span class="number">0x4123</span>&#125;;</span><br><span class="line">    decrypt(v, <span class="number">8</span>, k);</span><br><span class="line">    <span class="built_in">printf</span>(v);</span><br><span class="line">    system(<span class="string">&quot;pause&quot;</span>);</span><br><span class="line">    <span class="keyword">return</span> <span class="number">0</span>;</span><br><span class="line">&#125;</span><br><span class="line"></span><br></pre></td></tr></table></figure>
@@ -317,26 +327,32 @@
 
 
 <h3 id="crackme2"><a href="#crackme2" class="headerlink" title="crackme2"></a>crackme2</h3><p>IDA打开</p>
-<p><img src="image-20240301181340809.png" alt="image-20240301181340809"></p>
+<img src="b3446baa/image-20240301181340809.png" class title="image-20240301181340809">
+
 <p>main函数中，先是读入flag，然后使用<code>sub_14000105C</code>函数进行加密和验证</p>
 <p>先看<code>sub_14000105C</code>函数</p>
-<p><img src="image-20240301181547044.png" alt="image-20240301181547044"></p>
+<img src="b3446baa/image-20240301181547044.png" class title="image-20240301181547044">
+
 <p>一个base64换表，解出来后是一个假的flag</p>
 <p>回到main函数，看中间这个爆红，tab跳转直接看汇编</p>
-<p><img src="image-20240301181716921.png" alt="image-20240301181716921"></p>
+<img src="b3446baa/image-20240301181716921.png" class title="image-20240301181716921">
+
 <p>可以发现在这段代码的下面还有一段代码，但是无法被反汇编</p>
-<p><img src="image-20240301181750892.png" alt="image-20240301181750892"></p>
+<img src="b3446baa/image-20240301181750892.png" class title="image-20240301181750892">
+
 <p>虽然无法反汇编看，但是直接看也可以看出是对<code>sub_14000105C</code>函数的异或，也就是刚刚出假flag的函数</p>
 <p>那么可以猜测是SMC，这里异或后呈现的是base64，而异或前才是真正的加密函数</p>
 <p>那么我们可以使用ida脚本来把这个函数异或回去，其中进行异或的另一堆数据就是上面的<code>unk_140006000</code></p>
 <p>先把<code>sub_14000105C</code>函数undefine</p>
-<p><img src="image-20240301182129960.png" alt="image-20240301182129960"></p>
+<img src="b3446baa/image-20240301182129960.png" class title="image-20240301182129960">
+
 <p>然后执行如下idapython脚本</p>
 <figure class="highlight c"><table><tr><td class="code"><pre><span class="line">import idc</span><br><span class="line"></span><br><span class="line"><span class="keyword">for</span> i in <span class="title function_">range</span><span class="params">(<span class="number">0x246A</span>)</span>:</span><br><span class="line">    idc.<span class="title function_">patch_byte</span><span class="params">(<span class="number">0x14000105C</span> + i, idc.get_db_byte(<span class="number">0x14000105C</span> + i) ^ idc.get_db_byte(<span class="number">0x140006000</span> + i))</span></span><br></pre></td></tr></table></figure>
 
 <p>执行脚本后，对<code>unk_14000105C</code>重新创建函数，之后f5查看伪代码</p>
 <p>此时就可以看到真正的加密函数了</p>
-<p><img src="image-20240301182757286.png" alt="image-20240301182757286"></p>
+<img src="b3446baa/image-20240301182757286.png" class title="image-20240301182757286">
+
 <p>一堆约束方程，使用z3规划求解</p>
 <p>这里在比赛时因为我创建变量使用的是BitVec，跑的非常慢，挂了一个下午都没出结果</p>
 <p>赛后看了官方wp才知道BitVec跑高维方程巨慢，使用Int一下子就可以出来了</p>
