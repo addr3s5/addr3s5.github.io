@@ -138,142 +138,6 @@
       </tags>
   </entry>
   <entry>
-    <title>HGAME—2024—week3</title>
-    <url>/post/2d20fe09.html</url>
-    <content><![CDATA[<p>HGAME 2024网络攻防大赛—week3部分题目题解</p>
-<span id="more"></span>
-
-<h2 id="reverse"><a href="#reverse" class="headerlink" title="reverse"></a>reverse</h2><h3 id="encrypt"><a href="#encrypt" class="headerlink" title="encrypt"></a>encrypt</h3><p>IDA打开，一堆Windows api</p>
-<img src="2d20fe09/Snipaste_2024-02-21_15-57-11.png" class title="Snipaste_2024-02-21_15-57-11">
-
-<p>首先先解释一下各个api的作用：</p>
-<p><strong>BCryptOpenAlgorithmProvider</strong>: 打开一个密码算法提供者。</p>
-<p><strong>BCryptGetProperty</strong>: 获取密码算法提供者的属性。在这里，它获取了<code>ObjectLength</code>和<code>BlockLength</code>两个属性。<code>ObjectLength</code>属性用于分配内存，<code>BlockLength</code>属性用于设置密码算法的块长度。</p>
-<p><strong>BCryptSetProperty</strong>: 设置密码算法提供者的属性。在这里，它设置了对称加密的链接模式（Chaining Mode）</p>
-<p><strong>BCryptGenerateSymmetricKey</strong>: 生成对称密钥。</p>
-<p><strong>BCryptExportKey</strong>: 导出密钥。</p>
-<p><strong>BCryptEncrypt</strong>: 加密数据。</p>
-<p><strong>BCryptDestroyKey</strong>: 销毁密钥对象。</p>
-<p><strong>BCryptCloseAlgorithmProvider</strong>: 关闭算法提供者。</p>
-<p><strong>GetProcessHeap</strong>: 获取当前进程的堆句柄。</p>
-<p><strong>HeapAlloc</strong>: 在堆中分配内存。</p>
-<p><strong>HeapFree</strong>: 释放堆中的内存。</p>
-<p>通过对这些api的解释，我们可以知道这个程序就是通过使用Windows api来生成一个加密体系来对flag进行加密</p>
-<p>看到最后：</p>
-<img src="2d20fe09/Snipaste_2024-02-21_16-05-26.png" class title="Snipaste_2024-02-21_16-05-26">
-
-<p>那么这个<code>unk_7FF796305050</code>应该就是密文了</p>
-<p>现在还需要知道加密模式，动调起来应该可以知道</p>
-<p>动调后进入到算法提供的<code>pszAlgId</code></p>
-<img src="2d20fe09/Snipaste_2024-02-21_16-09-54.png" class title="Snipaste_2024-02-21_16-09-54">
-
-<img src="2d20fe09/Snipaste_2024-02-21_16-10-03.png" class title="Snipaste_2024-02-21_16-10-03">
-
-<img src="2d20fe09/Snipaste_2024-02-21_16-10-08.png" class title="Snipaste_2024-02-21_16-10-08">
-
-<p>可以知道该加密算法是aes，模式是cbc</p>
-<p>那么现在还需要找到key和iv</p>
-<p><code>BCryptGenerateSymmetricKey</code>是生成key</p>
-<img src="2d20fe09/Snipaste_2024-02-21_16-23-39.png" class title="Snipaste_2024-02-21_16-23-39">
-
-<p>那么key就在<code>pbSecret</code>里</p>
-<img src="2d20fe09/Snipaste_2024-02-21_16-25-54.png" class title="Snipaste_2024-02-21_16-25-54">
-
-<p>iv则猜测在memcpy对<code>&amp;unk_7FF78E6634A0</code>的比较中</p>
-<p>最后使用cyberchef解aes</p>
-<img src="2d20fe09/Snipaste_2024-02-21_16-28-19.png" class title="Snipaste_2024-02-21_16-28-19">
-
-
-
-<h3 id="mystery"><a href="#mystery" class="headerlink" title="mystery"></a>mystery</h3><p>IDA打开，通过strings定位到关键函数</p>
-<img src="2d20fe09/Snipaste_2024-02-21_16-29-58.png" class title="Snipaste_2024-02-21_16-29-58">
-
-<img src="2d20fe09/Snipaste_2024-02-21_16-30-07.png" class title="Snipaste_2024-02-21_16-30-07">
-
-<p>首先第一个函数就是生成一个keybox</p>
-<img src="2d20fe09/Snipaste_2024-02-21_16-30-41.png" class title="Snipaste_2024-02-21_16-30-41">
-
-<p>第二步则是使用生成的keybox对我们的输入进行加密</p>
-<img src="2d20fe09/Snipaste_2024-02-21_16-31-40.png" class title="Snipaste_2024-02-21_16-31-40">
-
-<p>两个函数合起来就是一个清晰的rc4，加密和解密都是同样的脚本，只不过最后被改为<code>*a2++ -= result;</code></p>
-<p>但是<code>result</code>可以通过动调获取，于是可以编写一个idapython的脚本，输出result</p>
-<img src="2d20fe09/Snipaste_2024-02-21_16-34-41.png" class title="Snipaste_2024-02-21_16-34-41">
-
-<p>首先在result转到指令下断点</p>
-<p>然后选edit breakpoint</p>
-<img src="2d20fe09/Snipaste_2024-02-21_16-35-53.png" class title="Snipaste_2024-02-21_16-35-53">
-
-<img src="2d20fe09/Snipaste_2024-02-21_16-37-33.png" class title="Snipaste_2024-02-21_16-37-33">
-
-<p>写下如下脚本</p>
-<figure class="highlight python"><table><tr><td class="code"><pre><span class="line"><span class="keyword">import</span> idaapi</span><br><span class="line"><span class="built_in">print</span>(idaapi.get_reg_val(<span class="string">&#x27;al&#x27;</span>),end=<span class="string">&#x27;,&#x27;</span>)</span><br><span class="line"><span class="keyword">return</span> <span class="literal">False</span></span><br></pre></td></tr></table></figure>
-
-<p>最后动调，随便给一个输入，就自动输出result了</p>
-<img src="2d20fe09/Snipaste_2024-02-21_16-42-58.png" class title="Snipaste_2024-02-21_16-42-58">
-
-<p>然后就是解密，s2是密文，key也给出</p>
-<p>exp：</p>
-<figure class="highlight python"><table><tr><td class="code"><pre><span class="line">v = [<span class="number">24</span>, <span class="number">37</span>, <span class="number">41</span>, <span class="number">32</span>, <span class="number">25</span>, <span class="number">39</span>, <span class="number">185</span>, <span class="number">201</span>, <span class="number">52</span>, <span class="number">199</span>, <span class="number">113</span>, <span class="number">201</span>, <span class="number">172</span>, <span class="number">23</span>, <span class="number">180</span>, <span class="number">30</span>, <span class="number">229</span>, <span class="number">233</span>, <span class="number">252</span>, <span class="number">42</span>, <span class="number">74</span>, <span class="number">1</span>, <span class="number">234</span>, <span class="number">121</span>, <span class="number">199</span>,</span><br><span class="line">     <span class="number">130</span>, <span class="number">254</span>, <span class="number">81</span>, <span class="number">231</span>, <span class="number">177</span>, <span class="number">174</span>, <span class="number">40</span>, <span class="number">21</span>, <span class="number">172</span>, <span class="number">45</span>, <span class="number">155</span>, <span class="number">21</span>, <span class="number">111</span>, <span class="number">57</span>, <span class="number">15</span>, <span class="number">200</span>, <span class="number">235</span>, <span class="number">72</span>, <span class="number">160</span>, <span class="number">41</span>, <span class="number">248</span>, <span class="number">25</span>, <span class="number">63</span>, <span class="number">1</span>, <span class="number">231</span>,</span><br><span class="line">     <span class="number">139</span>, <span class="number">31</span>, <span class="number">143</span>, <span class="number">15</span>, <span class="number">189</span>, <span class="number">246</span>]</span><br><span class="line">s = [<span class="number">0x50</span>, <span class="number">0x42</span>, <span class="number">0x38</span>, <span class="number">0x4D</span>, <span class="number">0x4C</span>, <span class="number">0x54</span>, <span class="number">0x90</span>, <span class="number">0x6F</span>, <span class="number">0xFE</span>, <span class="number">0x6F</span>,</span><br><span class="line">     <span class="number">0xBC</span>, <span class="number">0x69</span>, <span class="number">0xB9</span>, <span class="number">0x22</span>, <span class="number">0x7C</span>, <span class="number">0x16</span>, <span class="number">0x8F</span>, <span class="number">0x44</span>, <span class="number">0x38</span>, <span class="number">0x4A</span>,</span><br><span class="line">     <span class="number">0xEF</span>, <span class="number">0x37</span>, <span class="number">0x43</span>, <span class="number">0xC0</span>, <span class="number">0xA2</span>, <span class="number">0xB6</span>, <span class="number">0x34</span>, <span class="number">0x2C</span>]</span><br><span class="line"><span class="keyword">for</span> i <span class="keyword">in</span> <span class="built_in">range</span>(<span class="built_in">len</span>(s)):</span><br><span class="line">    <span class="built_in">print</span>(<span class="built_in">chr</span>((s[i] + v[i])%<span class="number">256</span>),end=<span class="string">&#x27;&#x27;</span>)</span><br></pre></td></tr></table></figure>
-
-
-
-<h3 id="findme"><a href="#findme" class="headerlink" title="findme"></a>findme</h3><p>IDA打开，进入到main函数</p>
-<img src="2d20fe09/Snipaste_2024-02-21_16-48-15.png" class title="Snipaste_2024-02-21_16-48-15">
-
-<p>下面的base64解码也是一个假的flag</p>
-<p>往下看 看到buffer</p>
-<img src="2d20fe09/Snipaste_2024-02-21_16-49-19.png" class title="Snipaste_2024-02-21_16-49-19">
-
-<p><code>mz......</code>像是一个exe文件头，根据题目描述，一堆奇怪的数据</p>
-<p>那么有可能这段数据就是题目的真正的exe，现在把这段数据dump出来</p>
-<p>编写脚本</p>
-<img src="2d20fe09/Snipaste_2024-02-21_16-51-20.png" class title="Snipaste_2024-02-21_16-51-20">
-
-<figure class="highlight c"><table><tr><td class="code"><pre><span class="line"><span class="type">static</span> <span class="title function_">main</span><span class="params">()</span></span><br><span class="line">&#123;</span><br><span class="line">    <span class="keyword">auto</span> i,fp;</span><br><span class="line">    fp = fopen(<span class="string">&quot;d:\\dump.exe&quot;</span>,<span class="string">&quot;wb&quot;</span>);</span><br><span class="line">    <span class="keyword">auto</span> start = <span class="number">0x140004040</span>;</span><br><span class="line">    <span class="keyword">auto</span> end = <span class="number">0x14000D8DF</span>;</span><br><span class="line">    <span class="keyword">for</span>(i=start;i&lt;end;i=i+<span class="number">4</span>)</span><br><span class="line">    &#123;</span><br><span class="line">        fputc(Byte(i),fp);</span><br><span class="line">    &#125;</span><br><span class="line">    fp.close();</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-
-<p>dump出来后打开得到的exe</p>
-<img src="2d20fe09/Snipaste_2024-02-21_16-54-36.png" class title="Snipaste_2024-02-21_16-54-36">
-
-<p>果然这才是真正的exe</p>
-<p>发现有许多jz jnz构成的花指令，手动patch掉后对main函数重新定义，则可以f5查看伪代码</p>
-<img src="2d20fe09/Snipaste_2024-02-21_16-56-57.png" class title="Snipaste_2024-02-21_16-56-57">
-
-<p>查看<code>sub_641068</code>函数和<code>sub_64110C</code>函数</p>
-<img src="2d20fe09/Snipaste_2024-02-21_16-57-43.png" class title="Snipaste_2024-02-21_16-57-43">
-
-<img src="2d20fe09/Snipaste_2024-02-21_16-57-48.png" class title="Snipaste_2024-02-21_16-57-48">
-
-<p>又是一个rc4，类似上面<code>mystery</code>题</p>
-<p>那么用idapython脚本导出result</p>
-<figure class="highlight python"><table><tr><td class="code"><pre><span class="line"><span class="keyword">import</span> idaapi</span><br><span class="line"><span class="built_in">print</span>(idaapi.get_reg_val(<span class="string">&#x27;al&#x27;</span>),end=<span class="string">&#x27;,&#x27;</span>)</span><br><span class="line"><span class="keyword">return</span> <span class="literal">False</span></span><br></pre></td></tr></table></figure>
-
-<p>最后用<code>密文—result</code>得到flag</p>
-<p>exp：</p>
-<figure class="highlight python"><table><tr><td class="code"><pre><span class="line">v = [<span class="number">0x7D</span>, <span class="number">0x2B</span>, <span class="number">0x43</span>, <span class="number">0xA9</span>, <span class="number">0xB9</span>, <span class="number">0x6B</span>, <span class="number">0x93</span>, <span class="number">0x2D</span>, <span class="number">0x9A</span>, <span class="number">0xD0</span>,</span><br><span class="line">  <span class="number">0x48</span>, <span class="number">0xC8</span>, <span class="number">0xEB</span>, <span class="number">0x51</span>, <span class="number">0x59</span>, <span class="number">0xE9</span>, <span class="number">0x74</span>, <span class="number">0x68</span>, <span class="number">0x8A</span>, <span class="number">0x45</span>,</span><br><span class="line">  <span class="number">0x6B</span>, <span class="number">0xBA</span>, <span class="number">0xA7</span>, <span class="number">0x16</span>, <span class="number">0xF1</span>, <span class="number">0x10</span>, <span class="number">0x74</span>, <span class="number">0xD5</span>, <span class="number">0x41</span>, <span class="number">0x3C</span>,</span><br><span class="line">  <span class="number">0x67</span>, <span class="number">0x7D</span>]</span><br><span class="line">s = [<span class="number">21</span>,<span class="number">196</span>,<span class="number">226</span>,<span class="number">60</span>,<span class="number">84</span>,<span class="number">240</span>,<span class="number">77</span>,<span class="number">193</span>,<span class="number">106</span>,<span class="number">89</span>,<span class="number">21</span>,<span class="number">86</span>,<span class="number">120</span>,<span class="number">242</span>,<span class="number">24</span>,<span class="number">119</span>,<span class="number">65</span>,<span class="number">9</span>,<span class="number">52</span>,<span class="number">224</span>,<span class="number">249</span>,<span class="number">65</span>,<span class="number">72</span>,<span class="number">176</span>,<span class="number">127</span>,<span class="number">220</span>,<span class="number">13</span>,<span class="number">99</span>,<span class="number">224</span>,<span class="number">206</span>,<span class="number">243</span>,<span class="number">0</span>]</span><br><span class="line"><span class="keyword">for</span> i <span class="keyword">in</span> <span class="built_in">range</span>(<span class="built_in">len</span>(v)):</span><br><span class="line">    c = v[i]-s[i]</span><br><span class="line">    <span class="keyword">if</span> c&lt;<span class="number">0</span>:</span><br><span class="line">        <span class="built_in">print</span>(<span class="built_in">chr</span>(c+<span class="number">256</span>),end=<span class="string">&#x27;&#x27;</span>)</span><br><span class="line">    <span class="keyword">else</span>:</span><br><span class="line">        <span class="built_in">print</span>(<span class="built_in">chr</span>(c),end=<span class="string">&#x27;&#x27;</span>)</span><br></pre></td></tr></table></figure>
-
-
-
-<h2 id="crypto"><a href="#crypto" class="headerlink" title="crypto"></a>crypto</h2><h3 id="exRSA"><a href="#exRSA" class="headerlink" title="exRSA"></a>exRSA</h3><p>attachment.py</p>
-<figure class="highlight python"><table><tr><td class="code"><pre><span class="line"><span class="keyword">from</span> Crypto.Util.number <span class="keyword">import</span> *</span><br><span class="line"><span class="keyword">from</span> secret <span class="keyword">import</span> flag</span><br><span class="line">m=bytes_to_long(flag)</span><br><span class="line">p=getStrongPrime(<span class="number">1024</span>)</span><br><span class="line">q=getStrongPrime(<span class="number">1024</span>)</span><br><span class="line">phi=(p-<span class="number">1</span>)*(q-<span class="number">1</span>)</span><br><span class="line">e1=inverse(getPrime(<span class="number">768</span>),phi)</span><br><span class="line">e2=inverse(getPrime(<span class="number">768</span>),phi)</span><br><span class="line">e3=inverse(getPrime(<span class="number">768</span>),phi)</span><br><span class="line">n=p*q</span><br><span class="line">c=<span class="built_in">pow</span>(m,<span class="number">0x10001</span>,n)</span><br><span class="line"><span class="built_in">print</span>(<span class="string">f&#x27;e1=<span class="subst">&#123;e1&#125;</span>&#x27;</span>)</span><br><span class="line"><span class="built_in">print</span>(<span class="string">f&#x27;e2=<span class="subst">&#123;e2&#125;</span>&#x27;</span>)</span><br><span class="line"><span class="built_in">print</span>(<span class="string">f&#x27;e3=<span class="subst">&#123;e3&#125;</span>&#x27;</span>)</span><br><span class="line"><span class="built_in">print</span>(<span class="string">f&#x27;c=<span class="subst">&#123;c&#125;</span>&#x27;</span>)</span><br><span class="line"><span class="built_in">print</span>(<span class="string">f&#x27;n=<span class="subst">&#123;n&#125;</span>&#x27;</span>)</span><br><span class="line"></span><br><span class="line"><span class="string">&quot;&quot;&quot;</span></span><br><span class="line"><span class="string">e1=5077048237811969427473111225370876122528967447056551899123613461792688002896788394304192917610564149766252232281576990293485239684145310876930997918960070816968829150376875953405420809586267153171717496198336861089523701832098322284501931142889817575816761705044951705530849327928849848158643030693363143757063220584714925893965587967042137557807261154117916358519477964645293471975063362050690306353627492980861008439765365837622657977958069853288056307253167509883258122949882277021665317807253308906355670472172346171177267688064959397186926103987259551586627965406979118193485527520976748490728460167949055289539</span></span><br><span class="line"><span class="string">e2=12526848298349005390520276923929132463459152574998625757208259297891115133654117648215782945332529081365273860316201130793306570777735076534772168999705895641207535303839455074003057687810381110978320988976011326106919940799160974228311824760046370273505511065619268557697182586259234379239410482784449815732335294395676302226416863709340032987612715151916084291821095462625821023133560415325824885347221391496937213246361736361270846741128557595603052713612528453709948403100711277679641218520429878897565655482086410576379971404789212297697553748292438183065500993375040031733825496692797699362421010271599510269401</span></span><br><span class="line"><span class="string">e3=12985940757578530810519370332063658344046688856605967474941014436872720360444040464644790980976991393970947023398357422203873284294843401144065013911463670501559888601145108651961098348250824166697665528417668374408814572959722789020110396245076275553505878565603509466220710219260037783849276475397283421068716088638186994778153542817681963059581651103563578804145156157584336712678882995685632615686853980176047683326974283896343322981521150211317597571554542488921290158122634140571148036732893808064119048328855134054709120877895941670166421664806186710346824494054783025733475898081247824887967550418509038276279</span></span><br><span class="line"><span class="string">c=1414176060152301842110497098024597189246259172019335414900127452098233943041825926028517437075316294943355323947458928010556912909139739282924255506647305696872907898950473108556417350199783145349691087255926287363286922011841143339530863300198239231490707393383076174791818994158815857391930802936280447588808440607415377391336604533440099793849237857247557582307391329320515996021820000355560514217505643587026994918588311127143566858036653315985177551963836429728515745646807123637193259859856630452155138986610272067480257330592146135108190083578873094133114440050860844192259441093236787002715737932342847147399</span></span><br><span class="line"><span class="string">n=17853303733838066173110417890593704464146824886316456780873352559969742615755294466664439529352718434399552818635352768033531948009737170697566286848710832800426311328560924133698481653594007727877031506265706341560810588064209681809146597572126173303463125668183837840427667101827234752823747483792944536893070188010357644478512143332014786539698535220139784440314481371464053954769822738407808161946943216714729685820896972467020893493349051243983390018762076812868678098172416465691550285372846402991995794349015838868221686216396597327273110165922789814315858462049706255254066724012925815100434953821856854529753</span></span><br><span class="line"><span class="string">phi=17853303733838066173110417890593704464146824886316456780873352559969742615755294466664439529352718434399552818635352768033531948009737170697566286848710832800426311328560924133698481653594007727877031506265706341560810588064209681809146597572126173303463125668183837840427667101827234752823747483792944536892802927070181771490686318736012878592343518366616230003156532617279650769801240788457082470798285098309787313234015003029546069389983917646339464213270307973083920197245464323265774603130048384907423910358440436321967414553635119220303427088297964135321132951478390454424777782514867778927855950169251946270628</span></span><br><span class="line"><span class="string">&quot;&quot;&quot;</span></span><br></pre></td></tr></table></figure>
-
-<p>考点是rsa多组低解密指数攻击，直接上脚本</p>
-<p>exp：</p>
-<figure class="highlight python"><table><tr><td class="code"><pre><span class="line"><span class="comment">#sage</span></span><br><span class="line"><span class="keyword">from</span> Crypto.Util.number <span class="keyword">import</span> long_to_bytes</span><br><span class="line"><span class="keyword">import</span> gmpy2</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">N = <span class="number">17853303733838066173110417890593704464146824886316456780873352559969742615755294466664439529352718434399552818635352768033531948009737170697566286848710832800426311328560924133698481653594007727877031506265706341560810588064209681809146597572126173303463125668183837840427667101827234752823747483792944536893070188010357644478512143332014786539698535220139784440314481371464053954769822738407808161946943216714729685820896972467020893493349051243983390018762076812868678098172416465691550285372846402991995794349015838868221686216396597327273110165922789814315858462049706255254066724012925815100434953821856854529753</span></span><br><span class="line">e1 = <span class="number">5077048237811969427473111225370876122528967447056551899123613461792688002896788394304192917610564149766252232281576990293485239684145310876930997918960070816968829150376875953405420809586267153171717496198336861089523701832098322284501931142889817575816761705044951705530849327928849848158643030693363143757063220584714925893965587967042137557807261154117916358519477964645293471975063362050690306353627492980861008439765365837622657977958069853288056307253167509883258122949882277021665317807253308906355670472172346171177267688064959397186926103987259551586627965406979118193485527520976748490728460167949055289539</span></span><br><span class="line">e2 = <span class="number">12526848298349005390520276923929132463459152574998625757208259297891115133654117648215782945332529081365273860316201130793306570777735076534772168999705895641207535303839455074003057687810381110978320988976011326106919940799160974228311824760046370273505511065619268557697182586259234379239410482784449815732335294395676302226416863709340032987612715151916084291821095462625821023133560415325824885347221391496937213246361736361270846741128557595603052713612528453709948403100711277679641218520429878897565655482086410576379971404789212297697553748292438183065500993375040031733825496692797699362421010271599510269401</span></span><br><span class="line">e3 = <span class="number">12985940757578530810519370332063658344046688856605967474941014436872720360444040464644790980976991393970947023398357422203873284294843401144065013911463670501559888601145108651961098348250824166697665528417668374408814572959722789020110396245076275553505878565603509466220710219260037783849276475397283421068716088638186994778153542817681963059581651103563578804145156157584336712678882995685632615686853980176047683326974283896343322981521150211317597571554542488921290158122634140571148036732893808064119048328855134054709120877895941670166421664806186710346824494054783025733475898081247824887967550418509038276279</span></span><br><span class="line">c = <span class="number">1414176060152301842110497098024597189246259172019335414900127452098233943041825926028517437075316294943355323947458928010556912909139739282924255506647305696872907898950473108556417350199783145349691087255926287363286922011841143339530863300198239231490707393383076174791818994158815857391930802936280447588808440607415377391336604533440099793849237857247557582307391329320515996021820000355560514217505643587026994918588311127143566858036653315985177551963836429728515745646807123637193259859856630452155138986610272067480257330592146135108190083578873094133114440050860844192259441093236787002715737932342847147399</span></span><br><span class="line"></span><br><span class="line"></span><br><span class="line"></span><br><span class="line">alpha2 = <span class="number">815.</span>/<span class="number">2048</span></span><br><span class="line">M1 = <span class="built_in">int</span>(gmpy2.mpz(N)**(<span class="number">3.</span>/<span class="number">2</span>))</span><br><span class="line">M2 = <span class="built_in">int</span>( gmpy2.mpz(N) )</span><br><span class="line">M3 = <span class="built_in">int</span>(gmpy2.mpz(N)**(<span class="number">3.</span>/<span class="number">2</span> + alpha2))</span><br><span class="line">M4 = <span class="built_in">int</span>( gmpy2.mpz(N)**(<span class="number">0.5</span>) )</span><br><span class="line">M5 = <span class="built_in">int</span>( gmpy2.mpz(N)**(<span class="number">3.</span>/<span class="number">2</span> + alpha2) )</span><br><span class="line">M6 = <span class="built_in">int</span>( gmpy2.mpz(N)**(<span class="number">1.</span>+alpha2) )</span><br><span class="line">M7 = <span class="built_in">int</span>( gmpy2.mpz(N)**(<span class="number">1.</span>+alpha2) )</span><br><span class="line">D = diagonal_matrix(ZZ, [M1, M2, M3, M4, M5, M6, M7, <span class="number">1</span>])</span><br><span class="line">B = Matrix(ZZ, [ [<span class="number">1</span>, -N,   <span class="number">0</span>,  N**<span class="number">2</span>,   <span class="number">0</span>,      <span class="number">0</span>,      <span class="number">0</span>,    -N**<span class="number">3</span>],</span><br><span class="line">                 [<span class="number">0</span>, e1, -e1, -e1*N, -e1,      <span class="number">0</span>,   e1*N,  e1*N**<span class="number">2</span>],</span><br><span class="line">                 [<span class="number">0</span>,  <span class="number">0</span>,  e2, -e2*N,   <span class="number">0</span>,   e2*N,      <span class="number">0</span>,  e2*N**<span class="number">2</span>],</span><br><span class="line">                 [<span class="number">0</span>,  <span class="number">0</span>,   <span class="number">0</span>, e1*e2,   <span class="number">0</span>, -e1*e2, -e1*e2, -e1*e2*N],</span><br><span class="line">                 [<span class="number">0</span>,  <span class="number">0</span>,   <span class="number">0</span>,     <span class="number">0</span>,  e3,  -e3*N,  -e3*N,  e3*N**<span class="number">2</span>],</span><br><span class="line">                 [<span class="number">0</span>,  <span class="number">0</span>,   <span class="number">0</span>,     <span class="number">0</span>,   <span class="number">0</span>,  e1*e3,      <span class="number">0</span>, -e1*e3*N],</span><br><span class="line">                 [<span class="number">0</span>,  <span class="number">0</span>,   <span class="number">0</span>,     <span class="number">0</span>,   <span class="number">0</span>,      <span class="number">0</span>,  e2*e3, -e2*e3*N],</span><br><span class="line">                 [<span class="number">0</span>,  <span class="number">0</span>,   <span class="number">0</span>,     <span class="number">0</span>,   <span class="number">0</span>,      <span class="number">0</span>,      <span class="number">0</span>, e1*e2*e3] ]) * D</span><br><span class="line"></span><br><span class="line">L = B.LLL()</span><br><span class="line"></span><br><span class="line">v = Matrix(ZZ, L[<span class="number">0</span>])</span><br><span class="line">x = v * B**(-<span class="number">1</span>)</span><br><span class="line">phi_ = (e1*x[<span class="number">0</span>,<span class="number">1</span>]/x[<span class="number">0</span>,<span class="number">0</span>]).floor()</span><br><span class="line">d = inverse_mod( <span class="number">65537</span>, phi_)</span><br><span class="line">m = <span class="built_in">hex</span>(power_mod(c, d, N))[<span class="number">2</span>:]</span><br><span class="line"><span class="built_in">print</span>(<span class="built_in">bytes</span>.fromhex(m))</span><br></pre></td></tr></table></figure>
-
-
-
-<h2 id="misc"><a href="#misc" class="headerlink" title="misc"></a>misc</h2><h3 id="与ai聊天"><a href="#与ai聊天" class="headerlink" title="与ai聊天"></a>与ai聊天</h3><p>misc签到题</p>
-<p>进网页让ai输出flag</p>
-<img src="2d20fe09/Snipaste_2024-02-21_17-12-50.png" class title="Snipaste_2024-02-21_17-12-50">]]></content>
-      <categories>
-        <category>WP</category>
-      </categories>
-      <tags>
-        <tag>WP</tag>
-      </tags>
-  </entry>
-  <entry>
     <title>HGAME—2024—week2</title>
     <url>/post/5a27ce9f.html</url>
     <content><![CDATA[<p>HGAME 2024网络攻防大赛—week2部分题目题解</p>
@@ -436,6 +300,142 @@
 <p>刚开始有想到Unicode，但是没解出来</p>
 <p>后面根据出题人提示得知rot8000（这里看见中文的字符应该就要考虑是不是Unicode偏移，密文的Unicode偏移多少会到hgame），解出flag</p>
 ]]></content>
+      <categories>
+        <category>WP</category>
+      </categories>
+      <tags>
+        <tag>WP</tag>
+      </tags>
+  </entry>
+  <entry>
+    <title>HGAME—2024—week3</title>
+    <url>/post/2d20fe09.html</url>
+    <content><![CDATA[<p>HGAME 2024网络攻防大赛—week3部分题目题解</p>
+<span id="more"></span>
+
+<h2 id="reverse"><a href="#reverse" class="headerlink" title="reverse"></a>reverse</h2><h3 id="encrypt"><a href="#encrypt" class="headerlink" title="encrypt"></a>encrypt</h3><p>IDA打开，一堆Windows api</p>
+<img src="2d20fe09/Snipaste_2024-02-21_15-57-11.png" class title="Snipaste_2024-02-21_15-57-11">
+
+<p>首先先解释一下各个api的作用：</p>
+<p><strong>BCryptOpenAlgorithmProvider</strong>: 打开一个密码算法提供者。</p>
+<p><strong>BCryptGetProperty</strong>: 获取密码算法提供者的属性。在这里，它获取了<code>ObjectLength</code>和<code>BlockLength</code>两个属性。<code>ObjectLength</code>属性用于分配内存，<code>BlockLength</code>属性用于设置密码算法的块长度。</p>
+<p><strong>BCryptSetProperty</strong>: 设置密码算法提供者的属性。在这里，它设置了对称加密的链接模式（Chaining Mode）</p>
+<p><strong>BCryptGenerateSymmetricKey</strong>: 生成对称密钥。</p>
+<p><strong>BCryptExportKey</strong>: 导出密钥。</p>
+<p><strong>BCryptEncrypt</strong>: 加密数据。</p>
+<p><strong>BCryptDestroyKey</strong>: 销毁密钥对象。</p>
+<p><strong>BCryptCloseAlgorithmProvider</strong>: 关闭算法提供者。</p>
+<p><strong>GetProcessHeap</strong>: 获取当前进程的堆句柄。</p>
+<p><strong>HeapAlloc</strong>: 在堆中分配内存。</p>
+<p><strong>HeapFree</strong>: 释放堆中的内存。</p>
+<p>通过对这些api的解释，我们可以知道这个程序就是通过使用Windows api来生成一个加密体系来对flag进行加密</p>
+<p>看到最后：</p>
+<img src="2d20fe09/Snipaste_2024-02-21_16-05-26.png" class title="Snipaste_2024-02-21_16-05-26">
+
+<p>那么这个<code>unk_7FF796305050</code>应该就是密文了</p>
+<p>现在还需要知道加密模式，动调起来应该可以知道</p>
+<p>动调后进入到算法提供的<code>pszAlgId</code></p>
+<img src="2d20fe09/Snipaste_2024-02-21_16-09-54.png" class title="Snipaste_2024-02-21_16-09-54">
+
+<img src="2d20fe09/Snipaste_2024-02-21_16-10-03.png" class title="Snipaste_2024-02-21_16-10-03">
+
+<img src="2d20fe09/Snipaste_2024-02-21_16-10-08.png" class title="Snipaste_2024-02-21_16-10-08">
+
+<p>可以知道该加密算法是aes，模式是cbc</p>
+<p>那么现在还需要找到key和iv</p>
+<p><code>BCryptGenerateSymmetricKey</code>是生成key</p>
+<img src="2d20fe09/Snipaste_2024-02-21_16-23-39.png" class title="Snipaste_2024-02-21_16-23-39">
+
+<p>那么key就在<code>pbSecret</code>里</p>
+<img src="2d20fe09/Snipaste_2024-02-21_16-25-54.png" class title="Snipaste_2024-02-21_16-25-54">
+
+<p>iv则猜测在memcpy对<code>&amp;unk_7FF78E6634A0</code>的比较中</p>
+<p>最后使用cyberchef解aes</p>
+<img src="2d20fe09/Snipaste_2024-02-21_16-28-19.png" class title="Snipaste_2024-02-21_16-28-19">
+
+
+
+<h3 id="mystery"><a href="#mystery" class="headerlink" title="mystery"></a>mystery</h3><p>IDA打开，通过strings定位到关键函数</p>
+<img src="2d20fe09/Snipaste_2024-02-21_16-29-58.png" class title="Snipaste_2024-02-21_16-29-58">
+
+<img src="2d20fe09/Snipaste_2024-02-21_16-30-07.png" class title="Snipaste_2024-02-21_16-30-07">
+
+<p>首先第一个函数就是生成一个keybox</p>
+<img src="2d20fe09/Snipaste_2024-02-21_16-30-41.png" class title="Snipaste_2024-02-21_16-30-41">
+
+<p>第二步则是使用生成的keybox对我们的输入进行加密</p>
+<img src="2d20fe09/Snipaste_2024-02-21_16-31-40.png" class title="Snipaste_2024-02-21_16-31-40">
+
+<p>两个函数合起来就是一个清晰的rc4，加密和解密都是同样的脚本，只不过最后被改为<code>*a2++ -= result;</code></p>
+<p>但是<code>result</code>可以通过动调获取，于是可以编写一个idapython的脚本，输出result</p>
+<img src="2d20fe09/Snipaste_2024-02-21_16-34-41.png" class title="Snipaste_2024-02-21_16-34-41">
+
+<p>首先在result转到指令下断点</p>
+<p>然后选edit breakpoint</p>
+<img src="2d20fe09/Snipaste_2024-02-21_16-35-53.png" class title="Snipaste_2024-02-21_16-35-53">
+
+<img src="2d20fe09/Snipaste_2024-02-21_16-37-33.png" class title="Snipaste_2024-02-21_16-37-33">
+
+<p>写下如下脚本</p>
+<figure class="highlight python"><table><tr><td class="code"><pre><span class="line"><span class="keyword">import</span> idaapi</span><br><span class="line"><span class="built_in">print</span>(idaapi.get_reg_val(<span class="string">&#x27;al&#x27;</span>),end=<span class="string">&#x27;,&#x27;</span>)</span><br><span class="line"><span class="keyword">return</span> <span class="literal">False</span></span><br></pre></td></tr></table></figure>
+
+<p>最后动调，随便给一个输入，就自动输出result了</p>
+<img src="2d20fe09/Snipaste_2024-02-21_16-42-58.png" class title="Snipaste_2024-02-21_16-42-58">
+
+<p>然后就是解密，s2是密文，key也给出</p>
+<p>exp：</p>
+<figure class="highlight python"><table><tr><td class="code"><pre><span class="line">v = [<span class="number">24</span>, <span class="number">37</span>, <span class="number">41</span>, <span class="number">32</span>, <span class="number">25</span>, <span class="number">39</span>, <span class="number">185</span>, <span class="number">201</span>, <span class="number">52</span>, <span class="number">199</span>, <span class="number">113</span>, <span class="number">201</span>, <span class="number">172</span>, <span class="number">23</span>, <span class="number">180</span>, <span class="number">30</span>, <span class="number">229</span>, <span class="number">233</span>, <span class="number">252</span>, <span class="number">42</span>, <span class="number">74</span>, <span class="number">1</span>, <span class="number">234</span>, <span class="number">121</span>, <span class="number">199</span>,</span><br><span class="line">     <span class="number">130</span>, <span class="number">254</span>, <span class="number">81</span>, <span class="number">231</span>, <span class="number">177</span>, <span class="number">174</span>, <span class="number">40</span>, <span class="number">21</span>, <span class="number">172</span>, <span class="number">45</span>, <span class="number">155</span>, <span class="number">21</span>, <span class="number">111</span>, <span class="number">57</span>, <span class="number">15</span>, <span class="number">200</span>, <span class="number">235</span>, <span class="number">72</span>, <span class="number">160</span>, <span class="number">41</span>, <span class="number">248</span>, <span class="number">25</span>, <span class="number">63</span>, <span class="number">1</span>, <span class="number">231</span>,</span><br><span class="line">     <span class="number">139</span>, <span class="number">31</span>, <span class="number">143</span>, <span class="number">15</span>, <span class="number">189</span>, <span class="number">246</span>]</span><br><span class="line">s = [<span class="number">0x50</span>, <span class="number">0x42</span>, <span class="number">0x38</span>, <span class="number">0x4D</span>, <span class="number">0x4C</span>, <span class="number">0x54</span>, <span class="number">0x90</span>, <span class="number">0x6F</span>, <span class="number">0xFE</span>, <span class="number">0x6F</span>,</span><br><span class="line">     <span class="number">0xBC</span>, <span class="number">0x69</span>, <span class="number">0xB9</span>, <span class="number">0x22</span>, <span class="number">0x7C</span>, <span class="number">0x16</span>, <span class="number">0x8F</span>, <span class="number">0x44</span>, <span class="number">0x38</span>, <span class="number">0x4A</span>,</span><br><span class="line">     <span class="number">0xEF</span>, <span class="number">0x37</span>, <span class="number">0x43</span>, <span class="number">0xC0</span>, <span class="number">0xA2</span>, <span class="number">0xB6</span>, <span class="number">0x34</span>, <span class="number">0x2C</span>]</span><br><span class="line"><span class="keyword">for</span> i <span class="keyword">in</span> <span class="built_in">range</span>(<span class="built_in">len</span>(s)):</span><br><span class="line">    <span class="built_in">print</span>(<span class="built_in">chr</span>((s[i] + v[i])%<span class="number">256</span>),end=<span class="string">&#x27;&#x27;</span>)</span><br></pre></td></tr></table></figure>
+
+
+
+<h3 id="findme"><a href="#findme" class="headerlink" title="findme"></a>findme</h3><p>IDA打开，进入到main函数</p>
+<img src="2d20fe09/Snipaste_2024-02-21_16-48-15.png" class title="Snipaste_2024-02-21_16-48-15">
+
+<p>下面的base64解码也是一个假的flag</p>
+<p>往下看 看到buffer</p>
+<img src="2d20fe09/Snipaste_2024-02-21_16-49-19.png" class title="Snipaste_2024-02-21_16-49-19">
+
+<p><code>mz......</code>像是一个exe文件头，根据题目描述，一堆奇怪的数据</p>
+<p>那么有可能这段数据就是题目的真正的exe，现在把这段数据dump出来</p>
+<p>编写脚本</p>
+<img src="2d20fe09/Snipaste_2024-02-21_16-51-20.png" class title="Snipaste_2024-02-21_16-51-20">
+
+<figure class="highlight c"><table><tr><td class="code"><pre><span class="line"><span class="type">static</span> <span class="title function_">main</span><span class="params">()</span></span><br><span class="line">&#123;</span><br><span class="line">    <span class="keyword">auto</span> i,fp;</span><br><span class="line">    fp = fopen(<span class="string">&quot;d:\\dump.exe&quot;</span>,<span class="string">&quot;wb&quot;</span>);</span><br><span class="line">    <span class="keyword">auto</span> start = <span class="number">0x140004040</span>;</span><br><span class="line">    <span class="keyword">auto</span> end = <span class="number">0x14000D8DF</span>;</span><br><span class="line">    <span class="keyword">for</span>(i=start;i&lt;end;i=i+<span class="number">4</span>)</span><br><span class="line">    &#123;</span><br><span class="line">        fputc(Byte(i),fp);</span><br><span class="line">    &#125;</span><br><span class="line">    fp.close();</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>dump出来后打开得到的exe</p>
+<img src="2d20fe09/Snipaste_2024-02-21_16-54-36.png" class title="Snipaste_2024-02-21_16-54-36">
+
+<p>果然这才是真正的exe</p>
+<p>发现有许多jz jnz构成的花指令，手动patch掉后对main函数重新定义，则可以f5查看伪代码</p>
+<img src="2d20fe09/Snipaste_2024-02-21_16-56-57.png" class title="Snipaste_2024-02-21_16-56-57">
+
+<p>查看<code>sub_641068</code>函数和<code>sub_64110C</code>函数</p>
+<img src="2d20fe09/Snipaste_2024-02-21_16-57-43.png" class title="Snipaste_2024-02-21_16-57-43">
+
+<img src="2d20fe09/Snipaste_2024-02-21_16-57-48.png" class title="Snipaste_2024-02-21_16-57-48">
+
+<p>又是一个rc4，类似上面<code>mystery</code>题</p>
+<p>那么用idapython脚本导出result</p>
+<figure class="highlight python"><table><tr><td class="code"><pre><span class="line"><span class="keyword">import</span> idaapi</span><br><span class="line"><span class="built_in">print</span>(idaapi.get_reg_val(<span class="string">&#x27;al&#x27;</span>),end=<span class="string">&#x27;,&#x27;</span>)</span><br><span class="line"><span class="keyword">return</span> <span class="literal">False</span></span><br></pre></td></tr></table></figure>
+
+<p>最后用<code>密文—result</code>得到flag</p>
+<p>exp：</p>
+<figure class="highlight python"><table><tr><td class="code"><pre><span class="line">v = [<span class="number">0x7D</span>, <span class="number">0x2B</span>, <span class="number">0x43</span>, <span class="number">0xA9</span>, <span class="number">0xB9</span>, <span class="number">0x6B</span>, <span class="number">0x93</span>, <span class="number">0x2D</span>, <span class="number">0x9A</span>, <span class="number">0xD0</span>,</span><br><span class="line">  <span class="number">0x48</span>, <span class="number">0xC8</span>, <span class="number">0xEB</span>, <span class="number">0x51</span>, <span class="number">0x59</span>, <span class="number">0xE9</span>, <span class="number">0x74</span>, <span class="number">0x68</span>, <span class="number">0x8A</span>, <span class="number">0x45</span>,</span><br><span class="line">  <span class="number">0x6B</span>, <span class="number">0xBA</span>, <span class="number">0xA7</span>, <span class="number">0x16</span>, <span class="number">0xF1</span>, <span class="number">0x10</span>, <span class="number">0x74</span>, <span class="number">0xD5</span>, <span class="number">0x41</span>, <span class="number">0x3C</span>,</span><br><span class="line">  <span class="number">0x67</span>, <span class="number">0x7D</span>]</span><br><span class="line">s = [<span class="number">21</span>,<span class="number">196</span>,<span class="number">226</span>,<span class="number">60</span>,<span class="number">84</span>,<span class="number">240</span>,<span class="number">77</span>,<span class="number">193</span>,<span class="number">106</span>,<span class="number">89</span>,<span class="number">21</span>,<span class="number">86</span>,<span class="number">120</span>,<span class="number">242</span>,<span class="number">24</span>,<span class="number">119</span>,<span class="number">65</span>,<span class="number">9</span>,<span class="number">52</span>,<span class="number">224</span>,<span class="number">249</span>,<span class="number">65</span>,<span class="number">72</span>,<span class="number">176</span>,<span class="number">127</span>,<span class="number">220</span>,<span class="number">13</span>,<span class="number">99</span>,<span class="number">224</span>,<span class="number">206</span>,<span class="number">243</span>,<span class="number">0</span>]</span><br><span class="line"><span class="keyword">for</span> i <span class="keyword">in</span> <span class="built_in">range</span>(<span class="built_in">len</span>(v)):</span><br><span class="line">    c = v[i]-s[i]</span><br><span class="line">    <span class="keyword">if</span> c&lt;<span class="number">0</span>:</span><br><span class="line">        <span class="built_in">print</span>(<span class="built_in">chr</span>(c+<span class="number">256</span>),end=<span class="string">&#x27;&#x27;</span>)</span><br><span class="line">    <span class="keyword">else</span>:</span><br><span class="line">        <span class="built_in">print</span>(<span class="built_in">chr</span>(c),end=<span class="string">&#x27;&#x27;</span>)</span><br></pre></td></tr></table></figure>
+
+
+
+<h2 id="crypto"><a href="#crypto" class="headerlink" title="crypto"></a>crypto</h2><h3 id="exRSA"><a href="#exRSA" class="headerlink" title="exRSA"></a>exRSA</h3><p>attachment.py</p>
+<figure class="highlight python"><table><tr><td class="code"><pre><span class="line"><span class="keyword">from</span> Crypto.Util.number <span class="keyword">import</span> *</span><br><span class="line"><span class="keyword">from</span> secret <span class="keyword">import</span> flag</span><br><span class="line">m=bytes_to_long(flag)</span><br><span class="line">p=getStrongPrime(<span class="number">1024</span>)</span><br><span class="line">q=getStrongPrime(<span class="number">1024</span>)</span><br><span class="line">phi=(p-<span class="number">1</span>)*(q-<span class="number">1</span>)</span><br><span class="line">e1=inverse(getPrime(<span class="number">768</span>),phi)</span><br><span class="line">e2=inverse(getPrime(<span class="number">768</span>),phi)</span><br><span class="line">e3=inverse(getPrime(<span class="number">768</span>),phi)</span><br><span class="line">n=p*q</span><br><span class="line">c=<span class="built_in">pow</span>(m,<span class="number">0x10001</span>,n)</span><br><span class="line"><span class="built_in">print</span>(<span class="string">f&#x27;e1=<span class="subst">&#123;e1&#125;</span>&#x27;</span>)</span><br><span class="line"><span class="built_in">print</span>(<span class="string">f&#x27;e2=<span class="subst">&#123;e2&#125;</span>&#x27;</span>)</span><br><span class="line"><span class="built_in">print</span>(<span class="string">f&#x27;e3=<span class="subst">&#123;e3&#125;</span>&#x27;</span>)</span><br><span class="line"><span class="built_in">print</span>(<span class="string">f&#x27;c=<span class="subst">&#123;c&#125;</span>&#x27;</span>)</span><br><span class="line"><span class="built_in">print</span>(<span class="string">f&#x27;n=<span class="subst">&#123;n&#125;</span>&#x27;</span>)</span><br><span class="line"></span><br><span class="line"><span class="string">&quot;&quot;&quot;</span></span><br><span class="line"><span class="string">e1=5077048237811969427473111225370876122528967447056551899123613461792688002896788394304192917610564149766252232281576990293485239684145310876930997918960070816968829150376875953405420809586267153171717496198336861089523701832098322284501931142889817575816761705044951705530849327928849848158643030693363143757063220584714925893965587967042137557807261154117916358519477964645293471975063362050690306353627492980861008439765365837622657977958069853288056307253167509883258122949882277021665317807253308906355670472172346171177267688064959397186926103987259551586627965406979118193485527520976748490728460167949055289539</span></span><br><span class="line"><span class="string">e2=12526848298349005390520276923929132463459152574998625757208259297891115133654117648215782945332529081365273860316201130793306570777735076534772168999705895641207535303839455074003057687810381110978320988976011326106919940799160974228311824760046370273505511065619268557697182586259234379239410482784449815732335294395676302226416863709340032987612715151916084291821095462625821023133560415325824885347221391496937213246361736361270846741128557595603052713612528453709948403100711277679641218520429878897565655482086410576379971404789212297697553748292438183065500993375040031733825496692797699362421010271599510269401</span></span><br><span class="line"><span class="string">e3=12985940757578530810519370332063658344046688856605967474941014436872720360444040464644790980976991393970947023398357422203873284294843401144065013911463670501559888601145108651961098348250824166697665528417668374408814572959722789020110396245076275553505878565603509466220710219260037783849276475397283421068716088638186994778153542817681963059581651103563578804145156157584336712678882995685632615686853980176047683326974283896343322981521150211317597571554542488921290158122634140571148036732893808064119048328855134054709120877895941670166421664806186710346824494054783025733475898081247824887967550418509038276279</span></span><br><span class="line"><span class="string">c=1414176060152301842110497098024597189246259172019335414900127452098233943041825926028517437075316294943355323947458928010556912909139739282924255506647305696872907898950473108556417350199783145349691087255926287363286922011841143339530863300198239231490707393383076174791818994158815857391930802936280447588808440607415377391336604533440099793849237857247557582307391329320515996021820000355560514217505643587026994918588311127143566858036653315985177551963836429728515745646807123637193259859856630452155138986610272067480257330592146135108190083578873094133114440050860844192259441093236787002715737932342847147399</span></span><br><span class="line"><span class="string">n=17853303733838066173110417890593704464146824886316456780873352559969742615755294466664439529352718434399552818635352768033531948009737170697566286848710832800426311328560924133698481653594007727877031506265706341560810588064209681809146597572126173303463125668183837840427667101827234752823747483792944536893070188010357644478512143332014786539698535220139784440314481371464053954769822738407808161946943216714729685820896972467020893493349051243983390018762076812868678098172416465691550285372846402991995794349015838868221686216396597327273110165922789814315858462049706255254066724012925815100434953821856854529753</span></span><br><span class="line"><span class="string">phi=17853303733838066173110417890593704464146824886316456780873352559969742615755294466664439529352718434399552818635352768033531948009737170697566286848710832800426311328560924133698481653594007727877031506265706341560810588064209681809146597572126173303463125668183837840427667101827234752823747483792944536892802927070181771490686318736012878592343518366616230003156532617279650769801240788457082470798285098309787313234015003029546069389983917646339464213270307973083920197245464323265774603130048384907423910358440436321967414553635119220303427088297964135321132951478390454424777782514867778927855950169251946270628</span></span><br><span class="line"><span class="string">&quot;&quot;&quot;</span></span><br></pre></td></tr></table></figure>
+
+<p>考点是rsa多组低解密指数攻击，直接上脚本</p>
+<p>exp：</p>
+<figure class="highlight python"><table><tr><td class="code"><pre><span class="line"><span class="comment">#sage</span></span><br><span class="line"><span class="keyword">from</span> Crypto.Util.number <span class="keyword">import</span> long_to_bytes</span><br><span class="line"><span class="keyword">import</span> gmpy2</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">N = <span class="number">17853303733838066173110417890593704464146824886316456780873352559969742615755294466664439529352718434399552818635352768033531948009737170697566286848710832800426311328560924133698481653594007727877031506265706341560810588064209681809146597572126173303463125668183837840427667101827234752823747483792944536893070188010357644478512143332014786539698535220139784440314481371464053954769822738407808161946943216714729685820896972467020893493349051243983390018762076812868678098172416465691550285372846402991995794349015838868221686216396597327273110165922789814315858462049706255254066724012925815100434953821856854529753</span></span><br><span class="line">e1 = <span class="number">5077048237811969427473111225370876122528967447056551899123613461792688002896788394304192917610564149766252232281576990293485239684145310876930997918960070816968829150376875953405420809586267153171717496198336861089523701832098322284501931142889817575816761705044951705530849327928849848158643030693363143757063220584714925893965587967042137557807261154117916358519477964645293471975063362050690306353627492980861008439765365837622657977958069853288056307253167509883258122949882277021665317807253308906355670472172346171177267688064959397186926103987259551586627965406979118193485527520976748490728460167949055289539</span></span><br><span class="line">e2 = <span class="number">12526848298349005390520276923929132463459152574998625757208259297891115133654117648215782945332529081365273860316201130793306570777735076534772168999705895641207535303839455074003057687810381110978320988976011326106919940799160974228311824760046370273505511065619268557697182586259234379239410482784449815732335294395676302226416863709340032987612715151916084291821095462625821023133560415325824885347221391496937213246361736361270846741128557595603052713612528453709948403100711277679641218520429878897565655482086410576379971404789212297697553748292438183065500993375040031733825496692797699362421010271599510269401</span></span><br><span class="line">e3 = <span class="number">12985940757578530810519370332063658344046688856605967474941014436872720360444040464644790980976991393970947023398357422203873284294843401144065013911463670501559888601145108651961098348250824166697665528417668374408814572959722789020110396245076275553505878565603509466220710219260037783849276475397283421068716088638186994778153542817681963059581651103563578804145156157584336712678882995685632615686853980176047683326974283896343322981521150211317597571554542488921290158122634140571148036732893808064119048328855134054709120877895941670166421664806186710346824494054783025733475898081247824887967550418509038276279</span></span><br><span class="line">c = <span class="number">1414176060152301842110497098024597189246259172019335414900127452098233943041825926028517437075316294943355323947458928010556912909139739282924255506647305696872907898950473108556417350199783145349691087255926287363286922011841143339530863300198239231490707393383076174791818994158815857391930802936280447588808440607415377391336604533440099793849237857247557582307391329320515996021820000355560514217505643587026994918588311127143566858036653315985177551963836429728515745646807123637193259859856630452155138986610272067480257330592146135108190083578873094133114440050860844192259441093236787002715737932342847147399</span></span><br><span class="line"></span><br><span class="line"></span><br><span class="line"></span><br><span class="line">alpha2 = <span class="number">815.</span>/<span class="number">2048</span></span><br><span class="line">M1 = <span class="built_in">int</span>(gmpy2.mpz(N)**(<span class="number">3.</span>/<span class="number">2</span>))</span><br><span class="line">M2 = <span class="built_in">int</span>( gmpy2.mpz(N) )</span><br><span class="line">M3 = <span class="built_in">int</span>(gmpy2.mpz(N)**(<span class="number">3.</span>/<span class="number">2</span> + alpha2))</span><br><span class="line">M4 = <span class="built_in">int</span>( gmpy2.mpz(N)**(<span class="number">0.5</span>) )</span><br><span class="line">M5 = <span class="built_in">int</span>( gmpy2.mpz(N)**(<span class="number">3.</span>/<span class="number">2</span> + alpha2) )</span><br><span class="line">M6 = <span class="built_in">int</span>( gmpy2.mpz(N)**(<span class="number">1.</span>+alpha2) )</span><br><span class="line">M7 = <span class="built_in">int</span>( gmpy2.mpz(N)**(<span class="number">1.</span>+alpha2) )</span><br><span class="line">D = diagonal_matrix(ZZ, [M1, M2, M3, M4, M5, M6, M7, <span class="number">1</span>])</span><br><span class="line">B = Matrix(ZZ, [ [<span class="number">1</span>, -N,   <span class="number">0</span>,  N**<span class="number">2</span>,   <span class="number">0</span>,      <span class="number">0</span>,      <span class="number">0</span>,    -N**<span class="number">3</span>],</span><br><span class="line">                 [<span class="number">0</span>, e1, -e1, -e1*N, -e1,      <span class="number">0</span>,   e1*N,  e1*N**<span class="number">2</span>],</span><br><span class="line">                 [<span class="number">0</span>,  <span class="number">0</span>,  e2, -e2*N,   <span class="number">0</span>,   e2*N,      <span class="number">0</span>,  e2*N**<span class="number">2</span>],</span><br><span class="line">                 [<span class="number">0</span>,  <span class="number">0</span>,   <span class="number">0</span>, e1*e2,   <span class="number">0</span>, -e1*e2, -e1*e2, -e1*e2*N],</span><br><span class="line">                 [<span class="number">0</span>,  <span class="number">0</span>,   <span class="number">0</span>,     <span class="number">0</span>,  e3,  -e3*N,  -e3*N,  e3*N**<span class="number">2</span>],</span><br><span class="line">                 [<span class="number">0</span>,  <span class="number">0</span>,   <span class="number">0</span>,     <span class="number">0</span>,   <span class="number">0</span>,  e1*e3,      <span class="number">0</span>, -e1*e3*N],</span><br><span class="line">                 [<span class="number">0</span>,  <span class="number">0</span>,   <span class="number">0</span>,     <span class="number">0</span>,   <span class="number">0</span>,      <span class="number">0</span>,  e2*e3, -e2*e3*N],</span><br><span class="line">                 [<span class="number">0</span>,  <span class="number">0</span>,   <span class="number">0</span>,     <span class="number">0</span>,   <span class="number">0</span>,      <span class="number">0</span>,      <span class="number">0</span>, e1*e2*e3] ]) * D</span><br><span class="line"></span><br><span class="line">L = B.LLL()</span><br><span class="line"></span><br><span class="line">v = Matrix(ZZ, L[<span class="number">0</span>])</span><br><span class="line">x = v * B**(-<span class="number">1</span>)</span><br><span class="line">phi_ = (e1*x[<span class="number">0</span>,<span class="number">1</span>]/x[<span class="number">0</span>,<span class="number">0</span>]).floor()</span><br><span class="line">d = inverse_mod( <span class="number">65537</span>, phi_)</span><br><span class="line">m = <span class="built_in">hex</span>(power_mod(c, d, N))[<span class="number">2</span>:]</span><br><span class="line"><span class="built_in">print</span>(<span class="built_in">bytes</span>.fromhex(m))</span><br></pre></td></tr></table></figure>
+
+
+
+<h2 id="misc"><a href="#misc" class="headerlink" title="misc"></a>misc</h2><h3 id="与ai聊天"><a href="#与ai聊天" class="headerlink" title="与ai聊天"></a>与ai聊天</h3><p>misc签到题</p>
+<p>进网页让ai输出flag</p>
+<img src="2d20fe09/Snipaste_2024-02-21_17-12-50.png" class title="Snipaste_2024-02-21_17-12-50">]]></content>
       <categories>
         <category>WP</category>
       </categories>
